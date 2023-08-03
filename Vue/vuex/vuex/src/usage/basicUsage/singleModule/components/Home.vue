@@ -15,7 +15,7 @@
     <button @click="clickFn()">+</button>
   </div>
 </template>
-<script>
+<script lang="ts">
 import { computed } from "vue";
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 import store from "../store/index.ts";
