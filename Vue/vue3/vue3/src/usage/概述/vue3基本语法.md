@@ -609,3 +609,125 @@ const doubleCount1 = computed({
 doubleCount1.value = 3;
 console.log(doubleCount1.value); // 3
 ```
+
+### 类和样式绑定
+
+通过对 DOM 中元素的`class`和`style`属性来绑定一个或多个动态值，实现元素样式的动态切换
+
+#### 绑定`class`
+
+##### 值为对象
+
+通过给`:class`来传递一个动态的对象值，实现元素`class`属性值的动态切换
+
+对于被绑定的对象，其键为一个字符串值，表示是否要添加的类名(即解析后`class='[键名]'`);对应的其值为一个真假值（`true`/`false`或者其它表示真假的值），表示其键对应的类名是否被添加
+
+```vue
+<template>
+  <div class="container">
+    <!-- 类和样式绑定 -->
+    <!-- 绑定class -->
+    <!-- 通过isActive的真假值来决定是否为以下DOM元素添加active类名 -->
+    <button :class="{ active: isActive }">click</button>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from "vue";
+// 添加active类名
+const isActive = ref(true);
+// const isActive = ref("someWhateverContent");
+// const isActive = ref(Symbol(''));
+
+// 不添加active类名
+// const isActive = ref('');
+// const isActive = ref(null);
+// const isActive = ref(undefined);
+</script>
+<style scoped>
+.active {
+  border: solid 1px red;
+}
+</style>
+```
+
+在对象中书写多个字段
+
+```vue
+<template>
+  <div class="container">
+    <!-- 类和样式绑定 -->
+    <!-- 绑定class -->
+    <!-- 通过isActive的真假值来决定是否为以下DOM元素添加active类名 -->
+    <div><button @click="change">change</button></div>
+    <!-- 点击按钮，通过添加或移除active类名实现button元素样式的动态切换 -->
+    <div>
+      <button @click="isActive = !isActive" :class="{ active: isActive }">
+        click
+      </button>
+    </div>
+    <div :class="{ active: isActive, 'text-danger': hasError }">some text</div>
+    <div :class="dynamicClassObj">some text</div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive } from "vue";
+const isActive = ref(true);
+const hasError = ref(false);
+
+// 切换样式
+const change = () => {
+  isActive.value = !isActive.value;
+  hasError.value = !hasError.value;
+};
+
+const dynamicClassObj = reactive({ active: isActive, "text-danger": hasError });
+</script>
+<style scoped>
+div {
+  margin: 10px 0;
+}
+
+.active {
+  border: solid 1px red;
+}
+
+.text-danger {
+  color: green;
+}
+</style>
+```
+或者直接绑定一个动态对象的对象名
+```vue
+<template>
+  <div class="container">
+    <div><button @click="change">change</button></div>
+    <div :class="dynamicClassObj">some text</div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive } from "vue";
+const isActive = ref(true);
+const hasError = ref(false);
+
+// 切换样式
+const change = () => {
+  isActive.value = !isActive.value;
+  hasError.value = !hasError.value;
+};
+
+const dynamicClassObj = reactive({ active: isActive, "text-danger": hasError });
+</script>
+<style scoped>
+div {
+  margin: 10px 0;
+}
+
+.active {
+  border: solid 1px red;
+}
+
+.text-danger {
+  color: green;
+}
+</style>
+```
