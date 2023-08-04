@@ -475,3 +475,137 @@ console.log(reactive(proxy) === proxy); // true
       addNum(state2);
     };
     ```
+
+### 计算属性
+
+可以通过计算属性将模板中复杂的表达式书写在 JS 中
+
+通过`computed`将表达式的结果进行返回之后在模板中使用
+
+```vue
+<template>
+  <div class="container">
+    <!-- 计算属性 -->
+    <p>年龄大于十岁的用户:{{ ageMoreThanTenUser }}</p>
+  </div>
+</template>
+<script setup lang="ts">
+import { computed, reactive } from "vue";
+
+const users = reactive([
+  {
+    name: "Alice1",
+    age: 12,
+  },
+  {
+    name: "Alice2",
+    age: 9,
+  },
+  {
+    name: "Alice3",
+    age: 7,
+  },
+]);
+// 使用computed对上述的users进行过滤
+const ageMoreThanTenUser = computed(
+  () => users.filter((user) => user.age >= 10)[0].name
+);
+</script>
+```
+
+`computed`会自动追踪响应式依赖，当响应式依赖的值(`users`)发生变化时，会自动对其返回的值进行更新
+
+##### 会缓存计算属性值
+
+可以发现，对于上述`ageMoreThanTenUser`值得获取，通过在模板中调用方法也可以实现
+
+```vue
+<template>
+  <div class="container">
+    <!-- 计算属性 -->
+    <p>年龄大于十岁的用户:{{ getAgeMoreThanTenUser() }}</p>
+  </div>
+</template>
+<script setup lang="ts">
+import { computed, reactive } from "vue";
+
+const users = reactive([
+  {
+    name: "Alice1",
+    age: 12,
+  },
+  {
+    name: "Alice2",
+    age: 9,
+  },
+  {
+    name: "Alice3",
+    age: 7,
+  },
+]);
+
+// 使用方法
+const getAgeMoreThanTenUser = () =>
+  users.filter((user) => user.age >= 10)[0].name;
+</script>
+<style scoped></style>
+```
+
+但是，相较于方法，计算属性返回的值会被保存。这意味着，只要计算属性的依赖值没有发生变化，就不会重新进行计算，使用的始终是上次计算之后返回的值;只有在每次依赖值发生改变时，才会进行重新计算
+
+方法调用总是会在重渲染发生时再次执行函数
+
+```vue
+<template>
+  <div class="container">
+    <p>{{ now }}</p>
+    <p>{{ getNow() }}</p>
+  </div>
+</template>
+<script setup lang="ts">
+import { computed, reactive } from "vue";
+
+const now = computed(() => {
+  console.log("now called ...");
+  // Date.now()不会作为依赖，now始终不会进行重新计算
+  return Date.now();
+});
+
+const getNow = () => {
+  // 每次组件重新渲染时再次调用
+  console.log("getNow called...");
+  return Date.now();
+};
+</script>
+<style scoped></style>
+```
+
+##### 可写的计算属性
+
+计算属性返回的值默认都是只读的，如果对其进行修改将报错
+
+```ts
+// 只读的计算属性
+const count = ref(1);
+const doubleCount = computed(() => count.value * 2);
+// doubleCount.value = 3; // 报错
+```
+
+可写的计算属性
+
+```ts
+// 可写的计算属性
+const count = ref(1);
+const doubleCount1 = computed({
+  get() {
+    return count.value * 2;
+  },
+  set(newVal) {
+    // 修改依赖的值，触发计算属性的重新计算，返回新的doubleCount1值
+    // 等价于对doubleCount1进行修改
+    count.value = newVal / 2;
+  },
+});
+doubleCount1.value = 3;
+console.log(doubleCount1.value); // 3
+```
