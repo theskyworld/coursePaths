@@ -1270,3 +1270,191 @@ defineEmits(["remove"]);
 </script>
 <style scoped></style>
 ```
+
+### 事件处理
+
+#### 事件监听
+
+通过`v-on:eventName`或者`@eventName`来对 DOM 元素中的事件进行监听
+
+其值可以为一个内联事件处理器或者一个方法事件处理器
+
+#### 内联事件处理器
+
+```vue
+<template>
+  <div>
+    <!-- 事件处理 -->
+    <!-- 内联事件处理器 -->
+    <p>{{ msg }}</p>
+    <button @click="count++">{{ count }}</button>
+    <button @click="increaseCount()">{{ count }}</button>
+    <!-- 传递参数 -->
+    <button @click="changeMsg('hi')">changeMsg</button>
+    <!-- 访问事件对象event -->
+    <button @click="warn('Form cannot be submitted yet', $event)">
+      submit
+    </button>
+    <!-- 或者 -->
+    <button @click="(event) => warn('Form cannot be submitted yet', event)">
+      submit
+    </button>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from "vue";
+const count = ref(0);
+
+const increaseCount = () => count.value++;
+</script>
+<style scoped></style>
+```
+
+#### 方法事件处理器
+
+```vue
+<template>
+  <div>
+    <!-- 事件处理 -->
+    <!-- 方法事件处理器 -->
+    <button @click="greet">greet</button>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from "vue";
+
+const greet = (e: Event) => {
+  if (e) {
+    console.log((e.target as any)?.tagName); // "BUTTON"
+  }
+};
+</script>
+<style scoped></style>
+```
+
+#### 事件修饰符
+
+包括以下事件修饰符
+
+- `.stop`
+- `.prevent`
+- `.self`
+- `.capture`
+- `.once`
+- `.passive`
+
+```html
+<!-- 单击事件将停止传递 -->
+<a @click.stop="doThis"></a>
+
+<!-- 提交事件将不再重新加载页面 -->
+<form @submit.prevent="onSubmit"></form>
+
+<!-- 修饰语可以使用链式书写 -->
+<a @click.stop.prevent="doThat"></a>
+
+<!-- 也可以只有修饰符 -->
+<form @submit.prevent></form>
+
+<!-- 仅当 event.target 是元素本身时才会触发事件处理器 -->
+<!-- 例如：事件处理器不来自子元素 -->
+<div @click.self="doThat">...</div>
+
+<!-- 添加事件监听器时，使用 `capture` 捕获模式 -->
+<!-- 例如：指向内部元素的事件，在被内部元素处理前，先被外部处理 -->
+<div @click.capture="doThis">...</div>
+
+<!-- 点击事件最多被触发一次 -->
+<a @click.once="doThis"></a>
+
+<!-- 滚动事件的默认行为 (scrolling) 将立即发生而非等待 `onScroll` 完成 -->
+<!-- 以防其中包含 `event.preventDefault()` -->
+<div @scroll.passive="onScroll">...</div>
+```
+
+#### 按键修饰符
+
+通过绑定特定的按键(`keyName`),当按键抬起或者按下时(`@keyup|keydown`触发特定的回调函数(`'callback'`)
+形式为`@keyup|keydown.keyName='callback'`
+
+```vue
+<template>
+  <div>
+    <!-- 事件处理 -->
+    <!-- 按键修饰符 -->
+    <!-- 当enter按键抬起时触发logContent事件回调函数 -->
+    <input @keyup.enter="logContent" v-model="content" />
+    <!-- 当enter按键按下时触发logContent事件回调函数,一直按下一直触发 -->
+    <input @keydown.enter="logContent" v-model="content" />
+    <input @keyup.page-down="logContent" />
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from "vue";
+
+const content = ref("");
+const logContent = () => console.log(content.value);
+</script>
+<style scoped></style>
+```
+
+常见的按键别名(`keyName`)有:
+
+- `.enter`
+- `.tab`
+- `.delete` (捕获“Delete”和“Backspace”两个按键)
+- `.esc`
+- `.space`
+- `.up`
+- `.down`
+- `.left`
+- `.right`
+
+以下按键别名只能绑定在`@keydown`上:
+
+- `.ctrl`
+- `.alt`
+- `.shift`
+- `.meta`
+
+```html
+<!-- 按下alt键时触发logContent事件回调函数 -->
+<input @keydown.alt="logContent" v-model="content" />
+```
+
+结合以上四个按键来绑定多个按键
+
+```html
+<!-- 绑定多个按键 -->
+<!-- 当alt键被按下,同时抬起enter键时触发logContent事件回调函数 -->
+<input @keyup.alt.enter="logContent" v-model="content" />
+```
+
+或者跟事件进行绑定
+
+```html
+<!-- 只有按下alt的同时点击按钮时才会触发logContent事件回调函数 -->
+<button @click.alt="logContent">alt+click</button>
+```
+
+##### `.exact`修饰符
+
+在上述跟事件绑定的情况中,只要是满足了按下 alt 的同时点击按钮的条件就会触发 logContent 事件回调函数,即使同时按下 Alt 或 Shift 也会触发
+
+通过`.exact`修饰符可以对上述问题进行修正
+
+```html
+<!-- 按下alt的同时点击按钮时触发,如果同时也按下了shift或者ctrl不会触发 -->
+<button @click.alt.exact="logContent">alt+click</button>
+```
+
+```html
+<!-- 只有点击按钮时才触发,同时按下其它键例如alt,ctrl,shift不会触发 -->
+<button @click.exact="logContent">alt+click</button>
+```
+
+##### 鼠标按键修饰符
+
+- `.left`
+- `.right`
+- `.middle`

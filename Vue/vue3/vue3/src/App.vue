@@ -6,7 +6,7 @@
     <!-- 类名的透传 -->
     <!-- <ClassAndStyleBound class="active text-danger"></ClassAndStyleBound> -->
     <!-- <ConditionalRendering></ConditionalRendering> -->
-    <ListRendering></ListRendering>
+    <!-- <ListRendering></ListRendering> -->
     <!-- 组件的列表渲染 -->
     <!-- 将以下组件渲染三遍 -->
     <!-- <ListRendering v-for="n in 3" :key="n"></ListRendering> -->
@@ -20,6 +20,8 @@
       <TodoListItem v-for="({ id, title }, index) in todos" :key="id" :title="title" @remove="todos.splice(index, 1)">
       </TodoListItem>
     </ul> -->
+
+    <EventHandle></EventHandle>
   </div>
 </template>
 <script setup lang="ts">
@@ -30,6 +32,7 @@ import ClassAndStyleBound from "./usage/basicUsage/ClassAndStyleBound.vue";
 import ConditionalRendering from "./usage/basicUsage/ConditionalRendering.vue";
 import ListRendering from "./usage/basicUsage/ListRendering.vue";
 import TodoListItem from "./usage/components/TodoListItem.vue";
+import EventHandle from "./usage/basicUsage/EventHandle.vue";
 import { reactive, ref } from "vue";
 
 
