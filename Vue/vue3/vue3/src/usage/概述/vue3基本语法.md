@@ -696,7 +696,9 @@ div {
 }
 </style>
 ```
+
 或者直接绑定一个动态对象的对象名
+
 ```vue
 <template>
   <div class="container">
@@ -730,4 +732,195 @@ div {
   color: green;
 }
 </style>
+```
+
+##### 值为数组
+
+此时数组中存在的元素的值代表要添加的类名，不存在的则代表不添加
+
+```vue
+<template>
+  <div class="container">
+    <!-- 通过数组添加active和text-danger类 -->
+    <div :class="[activeClass, errClass]">someText</div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive } from "vue";
+
+// 添加active类
+const activeClass = ref("active");
+// 添加text-danger类
+const errClass = ref("text-danger");
+
+//
+</script>
+<style scoped>
+div {
+  margin: 10px 0;
+}
+
+.active {
+  border: solid 1px red;
+}
+
+.text-danger {
+  color: green;
+}
+</style>
+```
+
+要控制某个类名的是否添加通过在模板中使用三元表达式或者结合对象来进行控制
+
+```vue
+<template>
+  <div class="container">
+    <div><button @click="change">change</button></div>
+    <!-- 使用三元表达式控制类名的是否添加 -->
+    <div :class="[isActive ? activeClass : '', errClass]">someText</div>
+    <!-- 或者结合对象使用 -->
+    <div :class="[{ active: isActive }, errClass]">someText</div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive } from "vue";
+// 添加active类名
+const isActive = ref(true);
+const hasError = ref(false);
+
+// 切换样式
+const change = () => {
+  isActive.value = !isActive.value;
+  hasError.value = !hasError.value;
+};
+
+// 添加active类
+const activeClass = ref("active");
+// 添加text-danger类
+const errClass = ref("text-danger");
+</script>
+<style scoped>
+div {
+  margin: 10px 0;
+}
+
+.active {
+  border: solid 1px red;
+}
+
+.text-danger {
+  color: green;
+}
+</style>
+```
+
+##### 组件类名的透传
+
+当在父组件中使用子组件时，如果在该子组件元素上添加了类名，那么这些类名会透传到对应子组件的根元素上进行添加
+
+```vue
+<template>
+  <!-- 父组件 -->
+  <!-- 类名的透传 -->
+  <ClassAndStyleBound class="active text-danger"></ClassAndStyleBound>
+</template>
+```
+
+```vue
+<template>
+  <!-- 子组件 -->
+  <!-- 组件类名的透传，透传到该根元素上 -->
+  <div></div>
+</template>
+```
+
+如果存在多个根元素，则通过为指定的根元素添加 vue 实例的 attrs 属性:`$attrs`来将透传的属性添加到该根元素上
+
+```vue
+<template>
+  <!-- 父组件 -->
+  <!-- 类名的透传 -->
+  <ClassAndStyleBound class="active text-danger"></ClassAndStyleBound>
+</template>
+```
+
+```vue
+<template>
+  <!-- 子组件 -->
+  <div></div>
+  <!-- 将透传的类名添加到该根元素上 -->
+  <p :class="$attrs.class">another root element</p>
+</template>
+```
+
+#### 绑定`style`
+
+类似于绑定`class`，也是用于动态的切换一个元素的样式，其值也存在对象和数组两种
+
+##### 值为对象
+
+对象的键名代表要添加的内置 CSS 样式名(例如`color`,`font-size`)，键值代表对应样式的值
+
+```vue
+<template>
+  <div>
+    <!-- 绑定style -->
+    <div :style="{ color: activeColor, 'font-size': fontSize + 'px' }">
+      someText
+    </div>
+    <div :style="dynamicStyleObj">someText</div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive } from "vue";
+
+// 绑定style
+// 通过变量的值确定具体样式
+const activeColor = ref("pink");
+const fontSize = ref(30);
+
+// 使用对象名
+// 更贴近于CSS的写法
+const dynamicStyleObj = reactive({
+  color: "red",
+  fontSize: "25px",
+});
+</script>
+```
+
+##### 值为数组
+
+通过数组为元素添加多个样式名
+
+```vue
+<template>
+  <div>
+    <!-- 值为数组 -->
+    <div :style="[baseStyle, colorfulStyle]">someText</div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive } from "vue";
+// 值为数组
+const baseStyle = reactive({
+  fontSize: "30px",
+});
+const colorfulStyle = reactive({
+  border: "solid 3px pink",
+});
+</script>
+```
+
+##### 自动添加样式名前缀
+
+在处理浏览器对样式的兼容性问题时，如果使用了需要[浏览器特殊前缀](https://developer.mozilla.org/en-US/docs/Glossary/Vendor_Prefix)的 CSS 样式时，vue 会自动添加对应的前缀，无需手动添加
+
+##### 样式多值
+
+或者，你也可以通过数组来为一个样式添加多个带有前缀的值，vue 仅会渲染浏览器支持的最后一个值
+
+```vue
+<template>
+  <div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
+</template>
 ```

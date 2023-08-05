@@ -3,7 +3,8 @@
     <!-- <TemplateSyntax></TemplateSyntax> -->
     <!-- <ReactivityBasic></ReactivityBasic> -->
     <!-- <Computed></Computed> -->
-    <ClassAndStyleBound></ClassAndStyleBound>
+    <!-- 类名的透传 -->
+    <ClassAndStyleBound class="active text-danger"></ClassAndStyleBound>
   </div>
 </template>
 <script setup lang="ts">
