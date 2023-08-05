@@ -979,49 +979,48 @@ const switchName = () => {
 
 ```vue
 <template>
-    <div>
-        <!-- 条件渲染 -->
-        <!-- v-if -->
-        <!-- 控制元素的是否渲染 -->
-        <p v-if="isRender">someText</p>
-        <button @click="isRender = !isRender">toggleIsRender</button>
+  <div>
+    <!-- 条件渲染 -->
+    <!-- v-if -->
+    <!-- 控制元素的是否渲染 -->
+    <p v-if="isRender">someText</p>
+    <button @click="isRender = !isRender">toggleIsRender</button>
 
-        <!-- v-show -->
-        <p v-show="isShow">vShow</p>
-        <button @click="isShow = !isShow">toogleIsShow</button>
-    </div>
+    <!-- v-show -->
+    <p v-show="isShow">vShow</p>
+    <button @click="isShow = !isShow">toogleIsShow</button>
+  </div>
 </template>
-<script setup lang='ts'>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref } from "vue";
 // v-if惰性渲染，初始条件为false,则不做任何事情
 const isRender = ref(false);
 
 // v-show
 // 无论初始条件为什么，初始都会进行渲染
 const isShow = ref(false);
-
 </script>
 ```
 
 #### `v-show`
 
 `v-show`的作用和`v-if`相同，用法类似
+
 ```vue
 <template>
-    <div>
-        <!-- 条件渲染 -->
-        <!-- v-show -->
-        <p v-show="isShow">vShow</p>
-        <button @click="isShow = !isShow">toogleIsShow</button>
-    </div>
+  <div>
+    <!-- 条件渲染 -->
+    <!-- v-show -->
+    <p v-show="isShow">vShow</p>
+    <button @click="isShow = !isShow">toogleIsShow</button>
+  </div>
 </template>
-<script setup lang='ts'>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref } from "vue";
 
 // v-show
 // 无论初始条件为什么，初始都会进行渲染
 const isShow = ref(false);
-
 </script>
 ```
 
@@ -1031,3 +1030,243 @@ const isShow = ref(false);
 - `v-if`则是真实地将元素进行销毁或者重建，在切换时，元素对应的事件监听器、子组件等都会跟着进行销毁或重建。并且，其渲染是惰性的，如果初始条件为 false，则不会做任何事情，直到条件为 true 之后才进行渲染
 - 因此，`v-if`有更高的切换开销，`v-show`有更高的初始渲染开销。如果需要频繁切换，使用`v-show`，反之，使用`v-if`
 - v-show 不支持在 `<template>` 元素上使用，也不能和 `v-else` 搭配使用
+
+### 列表渲染
+
+将`v-for`添加到那个需要被渲染成列表（多项）的元素上
+
+##### 遍历数组
+
+使用`v-for`指令来基于一个数组渲染出一个列表
+
+```vue
+<template>
+  <div>
+    <!-- 列表渲染 -->
+    <div>
+      <ul>
+        <li v-for="name in names" :key="name">{{ name }}</li>
+        <!-- 也可以使用...of... -->
+        <li v-for="name of names" :key="name">{{ name }}</li>
+      </ul>
+    </div>
+    <div>
+      <p v-for="(user, index) in users" :key="user.id">
+        <span>{{ index }}-</span>
+        <span>userName : {{ user.name }}-</span>
+        <span>userAge : {{ user.age }}</span>
+      </p>
+      <!-- 使用对象的解构语法 -->
+      <p v-for="({ id, name, age }, index) in users" :key="id">
+        <span>{{ index }}-</span>
+        <span>userName : {{ name }}-</span>
+        <span>userAge : {{ age }}</span>
+      </p>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from "vue";
+
+const names = ref(["Alice1", "Alice2", "Alice3"]);
+
+const users = ref([
+  {
+    id: 1,
+    name: "Alice1",
+    age: 12,
+  },
+  {
+    id: 2,
+    name: "Alice2",
+    age: 13,
+  },
+  {
+    id: 3,
+    name: "Alice3",
+    age: 14,
+  },
+]);
+</script>
+<style scoped></style>
+```
+
+##### 遍历对象
+
+还可以基于一个对象来进行列表渲染
+
+```vue
+<template>
+  <div>
+    <!-- 列表渲染 -->
+    <!-- 基于对象 -->
+    <div>
+      <!-- 第一个为值,第二个为键,第三个为索引 -->
+      <p v-for="(value, key, index) in obj" :key="index">
+        <span>{{ index }}-{{ key }}:{{ value }}</span>
+      </p>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { reactive, ref } from "vue";
+const obj = reactive({
+  title: "How to do lists in Vue",
+  author: "Jane Doe",
+  publishedAt: "2016-04-10",
+});
+</script>
+<style scoped></style>
+```
+
+##### 遍历范围数值
+
+还可以基于一个表示范围的数组进行列表渲染
+
+```vue
+<template>
+  <div>
+    <!-- 列表渲染 -->
+    <!-- 基于范围数值 -->
+    <div>
+      <!-- 将以下内容渲染五遍 -->
+      <!-- n从1开始 -->
+      <p v-for="n in 5" :key="n">wonderful!</p>
+    </div>
+  </div>
+</template>
+<script setup lang="ts"></script>
+<style scoped></style>
+```
+
+##### 可以在`template`上使用
+
+```vue
+<template>
+  <div>
+    <!-- 列表渲染 -->
+    <!-- 在template上使用 -->
+    <div>
+      <template v-for="{ id, name, age } in users" :key="id">
+        <ul>
+          <li>{{ name }}</li>
+          <li>{{ age }}</li>
+        </ul>
+        <p>{{ name }}-{{ age }}</p>
+      </template>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { reactive, ref } from "vue";
+
+const users = ref([
+  {
+    id: 1,
+    name: "Alice1",
+    age: 12,
+  },
+  {
+    id: 2,
+    name: "Alice2",
+    age: 13,
+  },
+  {
+    id: 3,
+    name: "Alice3",
+    age: 14,
+  },
+]);
+</script>
+<style scoped></style>
+```
+
+##### 可以在一个组件上使用
+
+```vue
+<template>
+  <!-- 将以下组件渲染三遍 -->
+  <ListRendering v-for="n in 3" :key="n"></ListRendering>
+</template>
+```
+
+还可以通过列表渲染来进行属性的传值
+
+结合列表渲染制作一个 todoList
+
+```vue
+<!-- App.vue -->
+<template>
+  <div class="container">
+    <!-- 还可以通过列表渲染来进行属性的传值 -->
+    <form @submit.prevent="addNewTodo">
+      <label for="new-todo">Add a todo</label>
+      <input
+        type="text"
+        id="new-todo"
+        v-model="newTodoTitle"
+        placeholder="E.g. Feed the cat"
+      />
+      <button>Add</button>
+    </form>
+    <ul>
+      <TodoListItem
+        v-for="({ id, title }, index) in todos"
+        :key="id"
+        :title="title"
+        @remove="todos.splice(index, 1)"
+      >
+      </TodoListItem>
+    </ul>
+  </div>
+</template>
+<script setup lang="ts">
+import TodoListItem from "./usage/components/TodoListItem.vue";
+import { reactive, ref } from "vue";
+
+// 初始渲染的todos
+const todos = ref([
+  {
+    id: 1,
+    title: "Do the dishes",
+  },
+  {
+    id: 2,
+    title: "Take out the trash",
+  },
+  {
+    id: 3,
+    title: "Mow the lawn",
+  },
+]);
+
+// 要添加的todo
+const newTodoTitle = ref("");
+let newTodoId = 4;
+const addNewTodo = () => {
+  todos.value.push({
+    id: newTodoId++,
+    title: newTodoTitle.value,
+  });
+  newTodoTitle.value = "";
+};
+</script>
+<style scoped></style>
+```
+
+```vue
+<!--TodoListItem.vue  -->
+<template>
+  <div>
+    <li>
+      {{ title }}
+      <button @click="$emit('remove')">remove</button>
+    </li>
+  </div>
+</template>
+<script setup lang="ts">
+defineProps(["title"]);
+defineEmits(["remove"]);
+</script>
+<style scoped></style>
+```
