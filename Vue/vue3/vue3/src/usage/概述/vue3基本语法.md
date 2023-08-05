@@ -924,3 +924,110 @@ const colorfulStyle = reactive({
   <div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
 </template>
 ```
+
+### 条件渲染
+
+#### `v-if`
+
+```vue
+<template>
+  <div>
+    <!-- 条件渲染 -->
+    <!-- v-if -->
+    <!-- 控制元素的是否渲染 -->
+    <p v-if="isRender">someText</p>
+    <button @click="isRender = !isRender">toggleIsRender</button>
+
+    <!-- v-else -->
+    <!-- 控制渲染元素的替代品 -->
+    <p v-if="isWonderful">wonderful!</p>
+    <p v-else>Opps!</p>
+    <button @click="isWonderful = !isWonderful">toogleIsWonderful</button>
+
+    <!-- v-else-if -->
+    <!-- 控制渲染哪个元素 -->
+    <p v-if="name === 'Alice1'">Alice1</p>
+    <p v-else-if="name === 'Alice2'">Alice2</p>
+    <p v-else-if="name === 'Alice3'">Alice3</p>
+    <button @click="switchName">switchName</button>
+
+    <!-- 通过添加在template元素上来控制多个元素的条件渲染 -->
+    <template v-if="isWonderful">
+      <p>wonderful!1</p>
+      <p>wonderful!2</p>
+      <p>hello</p>
+      <button disabled>button</button>
+    </template>
+    <p v-else>Opps!</p>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from "vue";
+const isRender = ref(true);
+const isWonderful = ref(true);
+
+const names = ["Alice1", "Alice2", "Alice3"];
+let name = ref("Alice1");
+const switchName = () => {
+  name.value = names[Math.floor(Math.random() * 3)];
+};
+</script>
+<style scoped></style>
+```
+
+##### 惰性渲染
+
+```vue
+<template>
+    <div>
+        <!-- 条件渲染 -->
+        <!-- v-if -->
+        <!-- 控制元素的是否渲染 -->
+        <p v-if="isRender">someText</p>
+        <button @click="isRender = !isRender">toggleIsRender</button>
+
+        <!-- v-show -->
+        <p v-show="isShow">vShow</p>
+        <button @click="isShow = !isShow">toogleIsShow</button>
+    </div>
+</template>
+<script setup lang='ts'>
+import { ref } from 'vue';
+// v-if惰性渲染，初始条件为false,则不做任何事情
+const isRender = ref(false);
+
+// v-show
+// 无论初始条件为什么，初始都会进行渲染
+const isShow = ref(false);
+
+</script>
+```
+
+#### `v-show`
+
+`v-show`的作用和`v-if`相同，用法类似
+```vue
+<template>
+    <div>
+        <!-- 条件渲染 -->
+        <!-- v-show -->
+        <p v-show="isShow">vShow</p>
+        <button @click="isShow = !isShow">toogleIsShow</button>
+    </div>
+</template>
+<script setup lang='ts'>
+import { ref } from 'vue';
+
+// v-show
+// 无论初始条件为什么，初始都会进行渲染
+const isShow = ref(false);
+
+</script>
+```
+
+区别在于
+
+- `v-show`会在 DOM 渲染中保留该元素，切换时只是切换元素的`display`属性，并且无论初始条件为 true 还是 false，初始时都会将元素进行渲染
+- `v-if`则是真实地将元素进行销毁或者重建，在切换时，元素对应的事件监听器、子组件等都会跟着进行销毁或重建。并且，其渲染是惰性的，如果初始条件为 false，则不会做任何事情，直到条件为 true 之后才进行渲染
+- 因此，`v-if`有更高的切换开销，`v-show`有更高的初始渲染开销。如果需要频繁切换，使用`v-show`，反之，使用`v-if`
+- v-show 不支持在 `<template>` 元素上使用，也不能和 `v-else` 搭配使用
