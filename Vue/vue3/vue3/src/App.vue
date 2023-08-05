@@ -21,7 +21,8 @@
       </TodoListItem>
     </ul> -->
 
-    <EventHandle></EventHandle>
+    <!-- <EventHandle></EventHandle> -->
+    <FormInputBinding></FormInputBinding>
   </div>
 </template>
 <script setup lang="ts">
@@ -34,6 +35,7 @@ import ListRendering from "./usage/basicUsage/ListRendering.vue";
 import TodoListItem from "./usage/components/TodoListItem.vue";
 import EventHandle from "./usage/basicUsage/EventHandle.vue";
 import { reactive, ref } from "vue";
+import FormInputBinding from "./usage/basicUsage/FormInputBinding.vue";
 
 
 // 初始渲染的todos

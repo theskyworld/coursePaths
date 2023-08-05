@@ -1458,3 +1458,186 @@ const logContent = () => console.log(content.value);
 - `.left`
 - `.right`
 - `.middle`
+
+### 表单输入绑定
+
+#### `v-model`原理
+
+vue 中通过`v-model`指令来将一个变量与表单中的值进行绑定
+
+<template>
+    <div>
+        <!-- 表单输入绑定 -->
+        <!-- msg变量的值将跟随输入框中的文本值进行变化 -->
+        <!-- 输入框中文本值也将随着msg变量值的变化而变化 -->
+        <p>{{ msg }}</p>
+        <input type="text" v-model="msg">
+        <button @click="msg = 'newMsg'">changeMsg</button>
+    </div>
+</template>
+<script setup lang='ts'>
+import { ref } from 'vue';
+const msg = ref('')
+</script>
+<style scoped></style>
+
+其底层逻辑是通过`v-bind`将表单输入框中`value`属性的值与变量(`msg`)进行绑定,实现`value`的值跟随`msg`变量的值进行变化;
+
+同时监听输入框的 input 事件,将输入框中的值(`value`值)发生更改时,每次将更改后的值重新赋值给`msg`变量,实现`msg`变量的更新
+
+最终实现`value`和`msg`的双向绑定
+
+```html
+<input type="text" :value="msg" @input="e => msg = (e.target as any)?.value" />
+<!-- 使用这种的形式,其中一种与v-model的区别在于: 对于需要使用 IME 的语言 (中文，日文和韩文等),在拼字阶段也触发更新-->
+```
+
+对于不同类型的输入框,会绑定不同的属性和监听不同的事件:
+
+- 对于文本类型的` <input>` 和`<textarea>`:绑定`value`属性,监听`input`事件
+- `<input type="checkbox">` 和 `<input type="radio">`:绑定`checked`属性,监听`change`事件
+- `<select>`:绑定`value`属性,监听`change`事件
+
+#### 表单绑定
+
+##### 绑定单行文本输入框
+
+```html
+<!-- 表单输入绑定 -->
+<!-- msg变量的值将跟随输入框中的文本值进行变化 -->
+<!-- 输入框中文本值也将随着msg变量值的变化而变化 -->
+<p>{{ msg }}</p>
+<input type="text" v-model="msg" />
+<!-- 等价于 -->
+<input type="text" :value="msg" @input="e => msg = (e.target as any)?.value" />
+<button @click="msg = 'newMsg'">changeMsg</button>
+```
+
+##### 绑定多行文本输入框
+
+```html
+<!-- 多行文本 -->
+<p style="white-space: pre-line;">{{ multiline }}</p>
+<textarea v-model="multiline"></textarea>
+```
+
+##### 绑定复选框
+
+```html
+<!-- 单一复选框 -->
+<input type="checkbox" id="checkbox" v-model="checked" />
+<label for="checkbox">{{ checked }}</label>
+
+<!-- 多个复选框 -->
+<div>checkedNames : {{ checkedNames }}</div>
+<input type="checkbox" id="jack" value="Jack" v-model="checkedNames" />
+<label for="jack">Jack</label>
+<input type="checkbox" id="john" value="John" v-model="checkedNames" />
+<label for="john">John</label>
+<input type="checkbox" id="mike" value="Mike" v-model="checkedNames" />
+<label for="mike">Mike</label>
+```
+
+##### 绑定单选按钮
+
+```html
+<!-- 单选按钮 -->
+<div>picked:{{ picked }}</div>
+<input type="radio" id="one" value="One" v-model="picked" />
+<label for="one">One</label>
+<input type="radio" id="two" value="Two" v-model="picked" />
+<label for="two">Two</label>
+```
+
+##### 绑定选择器
+
+```vue
+<template>
+  <div>
+    <!-- 单值选择器 -->
+    <div>selected : {{ selected }}</div>
+    <select v-model="selected">
+      <option value="" disabled>select one</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+    </select>
+    <!-- 多值选择器 -->
+    <div>selected : {{ selecteds }}</div>
+    <select v-model="selecteds" multiple>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+    </select>
+
+    <!-- 动态渲染选择器的选项 -->
+    <div>selectedName : {{ selectedName }}</div>
+    <select v-model="selectedName">
+      <option value="" disabled>select one</option>
+      <option v-for="(option, index) in options" :key="option" :value="option">
+        {{ option }}
+      </option>
+    </select>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref } from "vue";
+const selectedName = ref("");
+const options = ref(["Alice1", "Alice2", "Alice3"]);
+</script>
+```
+
+##### 动态值绑定
+
+```vue
+<template>
+  <!-- 动态值绑定 -->
+  <div>toggle : {{ toggle }}</div>
+  <!-- 默认情况下,toggle展示的值为true/false,现在通过true-valu和false-value的指定,toggle展示的值为yes/no -->
+  <input type="checkbox" v-model="toggle" true-value="yes" false-value="no" />
+  <!-- 动态绑定 -->
+  <div>dynamicToggle : {{ dynamicToggle }}</div>
+  <input
+    type="checkbox"
+    v-model="dynamicToggle"
+    :true-value="dynamicTrueValue"
+    :false-value="dynamicFalseValue"
+  />
+</template>
+<script>
+const toggle = ref("");
+const dynamicToggle = ref("");
+const dynamicTrueValue = "right";
+const dynamicFalseValue = "wrong";
+</script>
+```
+
+#### 修饰符
+
+##### `.lazy`
+
+`v-model`默认在每次`input`事件之后更新数据,通过添加`.lazy`修饰符改为在每次`change`事件之后更新数据
+
+```html
+<input v-model.lazy="msg" />
+```
+
+##### `.number`
+
+将用户输入的内容自动转换为数值
+
+底层通过调用`parseFloat()`进行转换,转换不了则返回原始值
+
+在`type="number"`的输入框中会自动启用
+
+```html
+<input v-model.number="age" />
+```
+
+##### `trim`
+
+自动去除用户输入内容的两端空格
+
+```html
+<input v-model.trim="msg" />
+```
