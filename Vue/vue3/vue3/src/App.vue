@@ -23,7 +23,8 @@
 
     <!-- <EventHandle></EventHandle> -->
     <!-- <FormInputBinding></FormInputBinding> -->
-    <Watch></Watch>
+    <!-- <Watch></Watch> -->
+    <TemplateReference ref="childInstance"></TemplateReference>
   </div>
 </template>
 <script setup lang="ts">
@@ -38,7 +39,8 @@ import EventHandle from "./usage/basicUsage/EventHandle.vue";
 
 import FormInputBinding from "./usage/basicUsage/FormInputBinding.vue";
 import Watch from "./usage/basicUsage/Watch.vue";
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
+import TemplateReference from "./usage/basicUsage/TemplateReference.vue";
 // 初始渲染的todos
 const todos = ref([
   {
@@ -69,6 +71,11 @@ const user = reactive({
   uname: 'Alice',
   uage: 12,
   ugender: 'female',
+})
+
+const childInstance = ref();
+onMounted(() => {
+  console.log(childInstance.value); // TemplateReference子组件实例
 })
 </script>
 <style scoped></style>

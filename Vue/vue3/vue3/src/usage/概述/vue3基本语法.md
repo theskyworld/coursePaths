@@ -1877,3 +1877,78 @@ watchEffect(async () => {
 如果需要侦听一个嵌套数据结构中的几个属性，`watchEffect()` 可能会比深度侦听器更有效，因为它将只跟踪回调中被使用到的属性，而不是递归地跟踪所有的属性
 
 `watchEffect` 仅会在其同步执行期间，才追踪依赖。在使用异步回调时，只有在第一个 `await`正常工作前访问到的属性才会被追踪
+
+### 模板引用
+
+可以通过 vue 中的一个特殊属性`ref`来对组件中的 DOM 元素或者子组件进行访问
+
+#### DOM 元素
+
+```vue
+<template>
+  <div>
+    <!-- 模板引用 -->
+    <p ref="pElem">some text</p>
+  </div>
+</template>
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+
+// 通过ref对上面的p元素进行访问
+// 需要注意的是声明的变量名要跟上述ref属性的值相同
+const pElem = ref();
+// 然后在组件挂载之后访问p元素
+onMounted(() => {
+  console.log(pElem.value.innerText); // "some Text"
+});
+</script>
+<style scoped></style>
+```
+
+当在`v-for`中使用模板引用时,它获取到的是所有被渲染出来的列表元素,值为一个数组
+
+```vue
+<template>
+    <div>
+        <!-- 模板引用 -->
+        <p>
+        <ul>
+            <li v-for="num in nums" :key="num" ref="numsElem"> {{ num }}</li>
+        </ul>
+        </p>
+    </div>
+</template>
+<script setup lang='ts'>
+import { onMounted, ref } from 'vue';
+
+const nums = ref([1, 2, 3]);
+const numsElem = ref();
+onMounted(() => {
+    console.log(numsElem.value); // 一个包含以上三个li元素的数组
+    console.log(numsElem.value[0].innerText); // 1
+})
+</script>
+<style scoped></style>
+```
+
+#### 子组件
+
+`ref`属性也可以被添加在一个子组件上,访问当前子组件实例
+
+```vue
+<template>
+  <div>
+    <!-- 模板引用 -->
+    <TemplateReference ref="childInstance"></TemplateReference>
+  </div>
+</template>
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+
+const childInstance = ref();
+onMounted(() => {
+  console.log(childInstance.value); // TemplateReference子组件实例
+});
+</script>
+<style scoped></style>
+```
