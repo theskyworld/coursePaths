@@ -1641,3 +1641,239 @@ const dynamicFalseValue = "wrong";
 ```html
 <input v-model.trim="msg" />
 ```
+
+### 生命周期钩子
+
+vue 中的每个生命周期钩子接收一个回调函数,在特定的时机对回调函数进行调用
+
+[对应的 API](https://cn.vuejs.org/api/composition-api-lifecycle.html)
+
+TODO : 在涉及到对应的 API 时进行整合完善
+
+### 侦听器
+
+#### `watch`
+
+通过计算属性`computed`可以很好地在依赖值发生变化时计算出其对应的衍生值,并且不建议在计算属性函数中添加副作用的操作,只用于返回计算值
+
+如果需要在依赖值发生变化时,执行相应的副作用操作,可以使用侦听器`watch`
+
+```vue
+<template>
+  <div>
+    <!-- 点击按钮,获取github上user的随机图片 -->
+    <button @click="uid = getRandomId()">change</button>
+    <img :src="targetAvatar" alt="" />
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, useAttrs, watch, computed } from "vue";
+import axios from "axios";
+
+interface Data {
+  id: number;
+  avatar_url: string;
+  [key: string]: any;
+}
+// 用户id,点击change按钮后随机切换
+const uid = ref(1);
+// 根据uid获取的对应user
+let targetUser = ref<Data>();
+// user的图像链接
+const targetAvatar = computed(() => targetUser.value?.avatar_url);
+
+const getRandomId = () => Math.floor(Math.random() * 30 + 1);
+// 侦听uid属性,每次变化时执行对应的回调函数
+watch(uid, async () => {
+  await axios.get("https://api.github.com/users").then((value) => {
+    const datas = value.data.splice(0, 30);
+    targetUser.value = datas.find((data: Data) => data.id === uid.value);
+  });
+});
+</script>
+<style scoped></style>
+```
+
+##### 侦听源类型
+
+侦听器中那个被侦听的对象可以为不同的形式,包括
+
+- 一个 ref 值,包含计算属性的返回值
+- 一个响应式对象
+- 一个 getter 函数
+- 多个被侦听的对象组成的数组
+
+```ts
+const x = ref(0);
+const y = ref(0);
+const obj = reactive({
+  count: 0,
+});
+
+// 单个 ref
+watch(x, (newX) => {
+  console.log(`x is ${newX}`);
+});
+
+// getter 函数
+watch(
+  () => x.value + y.value,
+  (sum) => {
+    console.log(`sum of x + y is: ${sum}`);
+  }
+);
+
+// 响应式对象
+watch(obj, (newObj) => {
+  console.log(newObj);
+});
+
+// 多个来源组成的数组
+watch([x, () => y.value], ([newX, newY]) => {
+  console.log(`x is ${newX} and y is ${newY}`);
+});
+```
+
+注意侦听响应式对象的某个属性时,需要使用 getter
+
+```ts
+// 提供一个 getter 函数
+watch(
+  () => obj.count,
+  (count) => {
+    console.log(`count is: ${count}`);
+  }
+);
+```
+
+##### 深层侦听器
+
+如果对一个响应式对象进行侦听,则默认会隐式地创建一个深层侦听器
+
+```ts
+const obj = reactive({ count: 0 });
+
+watch(obj, (newValue, oldValue) => {
+  // 深层侦听器
+});
+
+obj.count++;
+```
+
+其它情况下,可以通过设置`deep`选项属性来开启深层侦听器
+
+```ts
+watch(
+  () => state.someObject,
+  (newValue, oldValue) => {},
+  { deep: true }
+);
+```
+
+##### 即时回调地侦听器
+
+默认情况下,侦听器中的回调函数都是懒执行的,仅当被侦听的数据源发生改变时,才会执行回调
+
+如果希望在刚创建侦听器的时候就执行一次回调函数,可以使用`immediate`选项属性
+
+```ts
+watch(source, (newValue, oldValue) => {}, { immediate: true });
+```
+
+##### 回调函数的触发时机
+
+默认情况下,回调函数都会在 vue 组件更新之前被调用,在回调函数中访问的 DOM 都是 vue 更新之前的状态
+
+如果想要访问 Vue 更新之后的状态,可以使用`flush: 'post'`选项属性
+
+```ts
+watch(source, callback, {
+  flush: "post",
+});
+
+watchEffect(callback, {
+  flush: "post",
+});
+```
+
+后置刷新的 `watchEffect() `有个更方便的别名 `watchPostEffect()`
+
+```ts
+import { watchPostEffect } from "vue";
+
+watchPostEffect(() => {});
+```
+
+##### 停止侦听器
+
+可以通过`watch`或者`watchEffect`返回的回到函数来手动停止一个侦听器.虽然侦听器都默认会在组件被卸载时自动停止
+
+```ts
+const unwatch = watch(source, () => {});
+const unwatch = watchEffect(() => {});
+
+// ...当该侦听器不再需要时
+unwatch();
+```
+
+但是需要注意的是,异步调用的侦听器不会自动停止侦听,因此避免将侦听器进行异步调用
+
+```ts
+<script setup>
+import { watchEffect } from 'vue'
+
+// 它会自动停止
+watchEffect(() => {})
+
+// ...这个则不会！
+setTimeout(() => {
+  watchEffect(() => {})
+}, 100)
+</script>
+```
+
+#### `watchEffect`
+
+在`watch`函数中,往往需要传入第一个参数来作为那个被侦听的数据源,然后再传入第二个参数作为回调函数
+
+如果那个被侦听的对象不仅作为一个数据源来使用,也同时在回调函数中被使用时,可以通过`watchEffect`来进行简化
+
+```ts
+const todoId = ref(1);
+const data = ref(null);
+watch(
+  todoId,
+  async () => {
+    await axios
+      .get(`https://jsonplaceholder.typicode.com/todos/${todoId.value}`)
+      .then((value) => {
+        data.value = value.data;
+      });
+  },
+  { immediate: true }
+);
+```
+
+使用`watchEffect`对以上情况进行简化
+
+```ts
+watchEffect(async () => {
+  await axios
+    .get(`https://jsonplaceholder.typicode.com/todos/${todoId.value}`)
+    .then((value) => {
+      data.value = value.data;
+    });
+});
+```
+
+在`watchEffect`函数中,只需要传入回调函数即可,会自动对回调函数中涉及到的所有依赖值进行追踪,变化时自动执行回调函数
+
+并且`watchEffect`函数默认是立即执行的
+
+对于只有一个依赖项的例子来说，`watchEffect()` 的好处相对较小
+
+但是对于有多个依赖项的侦听器来说，使用 `watchEffect()` 可以消除手动维护依赖列表的负担
+
+如果需要侦听一个嵌套数据结构中的几个属性，`watchEffect()` 可能会比深度侦听器更有效，因为它将只跟踪回调中被使用到的属性，而不是递归地跟踪所有的属性
+
+`watchEffect` 仅会在其同步执行期间，才追踪依赖。在使用异步回调时，只有在第一个 `await`正常工作前访问到的属性才会被追踪

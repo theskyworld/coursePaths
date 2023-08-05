@@ -22,7 +22,8 @@
     </ul> -->
 
     <!-- <EventHandle></EventHandle> -->
-    <FormInputBinding></FormInputBinding>
+    <!-- <FormInputBinding></FormInputBinding> -->
+    <Watch></Watch>
   </div>
 </template>
 <script setup lang="ts">
@@ -34,10 +35,10 @@ import ConditionalRendering from "./usage/basicUsage/ConditionalRendering.vue";
 import ListRendering from "./usage/basicUsage/ListRendering.vue";
 import TodoListItem from "./usage/components/TodoListItem.vue";
 import EventHandle from "./usage/basicUsage/EventHandle.vue";
-import { reactive, ref } from "vue";
+
 import FormInputBinding from "./usage/basicUsage/FormInputBinding.vue";
-
-
+import Watch from "./usage/basicUsage/Watch.vue";
+import { reactive, ref } from "vue";
 // 初始渲染的todos
 const todos = ref([
   {
