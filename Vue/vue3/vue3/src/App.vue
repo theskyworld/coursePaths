@@ -26,7 +26,9 @@
     <!-- <Watch></Watch> -->
     <!-- <TemplateReference ref="childInstance"></TemplateReference> -->
     <!-- 通过组件进行数据传递 -->
-    <Props  v-bind="propsToProps" prop1="prop1Value" prop2="prop2Value"></Props>
+    <!-- <Props  v-bind="propsToProps" prop1="prop1Value" prop2="prop2Value"></Props> -->
+    <!-- 通过组件进行事件回调函数的传递 -->
+    <Emits @say-hello="sayHello" @increase-by="increaseBy"></Emits>
   </div>
 </template>
 <script setup lang="ts">
@@ -44,6 +46,7 @@ import Watch from "./usage/basicUsage/Watch.vue";
 import { onMounted, reactive, ref } from "vue";
 import TemplateReference from "./usage/basicUsage/TemplateReference.vue";
 import Props from "./usage/basicUsage/Props.vue";
+import Emits from "./usage/basicUsage/Emits.vue";
 // 初始渲染的todos
 const todos = ref([
   {
@@ -84,7 +87,12 @@ onMounted(() => {
 
 const propsToProps = reactive({
   name: 'Alice',
-  age : 12,
+  age: 12,
 })
+
+const sayHello = () => console.log("hello");
+
+const count = ref(0);
+const increaseBy = (n: number) => count.value += n; 
 </script>
 <style scoped></style>

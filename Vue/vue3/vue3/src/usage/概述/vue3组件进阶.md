@@ -178,7 +178,7 @@ console.log(props.prop1, props.prop2); // "prop1Value" "prop2Value"
 </template>
 ```
 
-#### props 规范
+#### prop 规范
 
 ##### props 名字格式
 
@@ -217,7 +217,7 @@ defineProps({
   <BlogPost is-published />
   <BlogPost :is-published="false" />
   <!-- 或者 -->
-  <BlogPost/>
+  <BlogPost />
   <BlogPost :is-published="post.isPublished" />
   <!-- 对应的prop声明为defineProps({is-published : Boolean}) -->
 
@@ -343,7 +343,9 @@ defineProps({
   },
 });
 ```
+
 `type`的值可以为以下值之一
+
 - `String`
 - `Number`
 - `Boolean`
@@ -353,3 +355,111 @@ defineProps({
 - `Function`
 - `Symbol`
 - 自定义以类或者构造函数
+
+### 组件事件回调函数传递
+
+除通过属性传值`defineProps`将数据从父组件向子组件传递外
+
+vue 中还可以通过`defineEmits`将事件回调函数从父组件传递到子组件
+
+#### 声明要传递的事件回调函数名
+
+```vue
+<template>
+  <div>
+    <!-- 组件事件回调函数传递 -->
+  </div>
+</template>
+<script setup lang="ts">
+// 声明要接收的事件回调函数
+const emit = defineEmits(["sayHello"]);
+// 或者
+interface Emit {
+  (e: "sayHello"): void;
+}
+const emit = defineEmits<Emit>();
+</script>
+<style scoped></style>
+```
+
+#### 对事件回调函数进行传递
+
+```vue
+<template>
+  <!-- 通过组件进行事件回调函数的传递 -->
+  <Emits @say-hello="sayHello"></Emits>
+</template>
+<script setup lang="ts">
+const sayHello = () => console.log("hello");
+</script>
+```
+
+#### 触发接收到的事件回调函数
+
+```vue
+<template>
+  <div>
+    <!-- 组件事件回调函数传递 -->
+    <button @click="clickFn">click</button>
+    <!-- 或者 -->
+    <button @click="$emit('sayHello')">click</button>
+  </div>
+</template>
+<script setup lang="ts">
+// 声明要接收的事件回调函数
+const emit = defineEmits(["sayHello"]);
+const clickFn = () => {
+  // 对接收到的事件事件回调函数进行触发
+  emit("sayHello");
+};
+</script>
+<style scoped></style>
+```
+
+#### 注意事项
+
+- 组件的事件回调函数同时也支持`.once`修饰符
+
+```vue
+<template>
+  <MyComponent @some-event.once="callback" />
+</template>
+```
+
+- 事件回调函数名的命名规范与 prop 相同
+- 组件触发的事件没有冒泡机制
+
+#### 参数处理
+
+```vue
+<template>
+  <div>
+    <!-- 组件事件回调函数传递 -->
+    <button @click="clickFn">click</button>
+  </div>
+</template>
+<script setup lang="ts">
+// 声明要接收的事件回调函数
+const emit = defineEmits(["increaseBy"]);
+const clickFn = () => {
+  // 对接收到的事件回调函数进行触发
+  emit("increaseBy", 1);
+};
+</script>
+<style scoped></style>
+```
+
+```vue
+<template>
+  <div class="container">
+    <!-- 通过组件进行事件回调函数的传递 -->
+    <Emits @increase-by="increaseBy"></Emits>
+  </div>
+</template>
+<script setup lang="ts">
+import Emits from "./usage/basicUsage/Emits.vue";
+const count = ref(0);
+const increaseBy = (n: number) => (count.value += n);
+</script>
+<style scoped></style>
+```
