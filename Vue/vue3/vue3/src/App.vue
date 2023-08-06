@@ -24,7 +24,9 @@
     <!-- <EventHandle></EventHandle> -->
     <!-- <FormInputBinding></FormInputBinding> -->
     <!-- <Watch></Watch> -->
-    <TemplateReference ref="childInstance"></TemplateReference>
+    <!-- <TemplateReference ref="childInstance"></TemplateReference> -->
+    <!-- 通过组件进行数据传递 -->
+    <Props  v-bind="propsToProps" prop1="prop1Value" prop2="prop2Value"></Props>
   </div>
 </template>
 <script setup lang="ts">
@@ -41,6 +43,7 @@ import FormInputBinding from "./usage/basicUsage/FormInputBinding.vue";
 import Watch from "./usage/basicUsage/Watch.vue";
 import { onMounted, reactive, ref } from "vue";
 import TemplateReference from "./usage/basicUsage/TemplateReference.vue";
+import Props from "./usage/basicUsage/Props.vue";
 // 初始渲染的todos
 const todos = ref([
   {
@@ -76,6 +79,12 @@ const user = reactive({
 const childInstance = ref();
 onMounted(() => {
   console.log(childInstance.value); // TemplateReference子组件实例
+})
+
+
+const propsToProps = reactive({
+  name: 'Alice',
+  age : 12,
 })
 </script>
 <style scoped></style>
