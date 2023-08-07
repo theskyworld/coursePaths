@@ -1108,3 +1108,44 @@ const message = inject(messageInjectionKey);
 </script>
 <style scoped></style>
 ```
+
+### 异步组件
+
+当我们导入一个组件时，可以使用`defineAsyncComponent`来异步导入一个组件
+
+只在需要该组件时才从服务器中进行加载导入
+
+```vue
+<script setup>
+import { defineAsyncComponent } from "vue";
+
+const AdminPage = defineAsyncComponent(
+  // 动态加载一个异步组件，当需要组件时才调用该回调函数对组件进行加载导入
+  () => import("./components/AdminPageComponent.vue")
+);
+</script>
+
+<template>
+  <AdminPage />
+</template>
+```
+
+`defineAsyncComponent`还支持接收一个配置对象
+
+```ts
+const AsyncComp = defineAsyncComponent({
+  // 异步加载组件
+  loader: () => import("./Foo.vue"),
+
+  // 加载异步组件过程中展示的loading组件
+  loadingComponent: LoadingComponent,
+  // 展示加载组件前的延迟时间，默认为 200ms
+  delay: 200,
+
+  // 加载失败后展示的组件
+  errorComponent: ErrorComponent,
+  // 如果提供了一个 timeout 时间限制，并超时了
+  // 也会显示这里配置的报错组件，默认值是：Infinity
+  timeout: 3000,
+});
+```
