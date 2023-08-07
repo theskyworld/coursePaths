@@ -463,3 +463,234 @@ const increaseBy = (n: number) => (count.value += n);
 </script>
 <style scoped></style>
 ```
+
+### 组件 v-model
+
+#### 子组件上实现
+
+结合`defineProps`和`defineEmits`就可以像原生元素一样在组件上使用`v-model`
+
+在组件上，`v-model`的实质为:
+
+```vue
+<!-- 父组件 -->
+<template>
+  <CustomInput
+    :modelValue="searchText"
+    @update:modelValue="(newValue) => (searchText = newValue)"
+  />
+</template>
+<script setup>
+import { ref } from "vue";
+const searchText = ref("");
+</script>
+```
+
+在子组件中声明`modelValue`属性，并将其跟`input`元素的`value`属性进行绑定，然后声明`update:modelValue`事件回调函数，就可以实现`searchText`和`CustomInput`子组件中`input`元素的双向绑定
+
+```vue
+<!-- CustomInput.vue -->
+<script setup>
+defineProps(["modelValue"]);
+defineEmits(["update:modelValue"]);
+</script>
+
+<template>
+  <input
+    :value="modelValue"
+    @input="$emit('update:modelValue', $event.target.value)"
+  />
+</template>
+```
+
+现在，可以直接在组件中使用`v-model`了
+
+```vue
+<template>
+  <CustomInput v-model="searchText" />
+</template>
+```
+
+组件 v-model 的核心逻辑都在于子组件上的对应实现，在父组件上只需要添加例如`v-model="searchText"`即可
+
+上面展示了一种在子组件上的实现方式
+
+还有另外一种的实现方式:
+
+```vue
+<!-- CustomInput.vue -->
+<script setup>
+import { computed } from "vue";
+
+const props = defineProps(["modelValue"]);
+const emit = defineEmits(["update:modelValue"]);
+
+// 添加一个额外的value变量
+const value = computed({
+  get() {
+    return props.modelValue;
+  },
+  set(value) {
+    emit("update:modelValue", value);
+  },
+});
+</script>
+
+<template>
+  <input v-model="value" />
+</template>
+```
+
+#### 自定义 v-model 的参数
+
+默认情况下，组件上的 v-model 其 prop 为`modelValue`,对应的事件为`update:modelValue`，参数为`modelValue`
+
+但是，可以在使用时通过以下方式来对参数名进行修改
+
+```vue
+<template>
+  <!-- 将参数modelValue改为title -->
+  <CustomInput v-model:title="searchText" />
+</template>
+```
+
+在子组件中，对应的实现为:
+
+```vue
+<!-- CustomInput.vue -->
+<script setup>
+defineProps(["title"]);
+defineEmits(["update:title"]);
+</script>
+
+<template>
+  <input
+    :value="modelValue"
+    @input="$emit('update:title', $event.target.value)"
+  />
+</template>
+```
+
+#### 多个组件 v-model
+
+在一个子组件上也可以使用多个 v-model 来绑定多个值，每个被绑定的值都对应各自不同的子组件中的原生元素，有着各自的事件监听处理程序，互不影响
+
+```vue
+<template>
+  <!-- 在一个组件上声明多个v-model -->
+  <CustomInput v-model:first-name="firstName" v-model:last-name="lastName" />
+</template>
+```
+
+```vue
+<script setup>
+defineProps({
+  firstName: String,
+  lastName: String,
+});
+
+defineEmits(["update:firstName", "update:lastName"]);
+</script>
+
+<template>
+  <input
+    type="text"
+    :value="firstName"
+    @input="$emit('update:firstName', $event.target.value)"
+  />
+  <input
+    type="text"
+    :value="lastName"
+    @input="$emit('update:lastName', $event.target.value)"
+  />
+</template>
+```
+
+#### 自定义修饰符
+
+v-model 除了支持一些内置的修饰符，例如`.trim`、`.number`外，还支持自定义的修饰符
+
+在子组件中创建指定修饰符的实现逻辑以及对修饰符进行使用的逻辑
+
+```vue
+<!-- CustomInput.vue -->
+<script setup>
+const props = defineProps({
+  modelValue: String,
+  // 用于存放所有使用的自定义修饰符，默认值为{}
+  modelModifiers: { default: () => ({}) },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+// .capitalize修饰符的实现逻辑
+const capitalizeFirstLetter = (value) => {
+  value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+function emitValue(e) {
+  let value = e.target.value;
+  // 对.capitalize修饰符进行使用
+  if (props.modelModifiers.capitalize) {
+    capitalizeFirstLetter(value);
+  }
+  // 触发事件回调函数
+  emit("update:modelValue", value);
+}
+</script>
+
+<template>
+  <input type="text" :value="modelValue" @input="emitValue" />
+</template>
+```
+
+在父组件中添加自定义修饰符进行使用
+
+```vue
+<template>
+  <CustomInput v-model.capitalize="myText" />
+</template>
+```
+
+如果使用修饰符的同时还带有 v-model 参数，则使用方式为:
+
+```vue
+<template>
+  <CustomInput v-model:title.capitalize="myText" />
+</template>
+```
+
+相应的子组件处理为:
+
+```ts
+const props = defineProps(["title", "titleModifiers"]);
+defineEmits(["update:title"]);
+
+console.log(props.titleModifiers); // { capitalize: true }
+```
+
+一个结合多组件 v-model、v-model 参数和修饰符的使用例子:
+
+```vue
+<template>
+  <CustomInput
+    v-model:first-name.capitalize="first"
+    v-model:last-name.uppercase="last"
+  />
+</template>
+```
+
+```ts
+<script setup>
+const props = defineProps({
+  firstName: String,
+  lastName: String,
+  firstNameModifiers: { default: () => ({}) },
+  lastNameModifiers: { default: () => ({}) }
+})
+defineEmits(['update:firstName', 'update:lastName'])
+
+console.log(props.firstNameModifiers) // { capitalize: true }
+console.log(props.lastNameModifiers) // { uppercase: true}
+</script>
+```
