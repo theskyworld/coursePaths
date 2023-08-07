@@ -31,7 +31,9 @@
     <!-- <Emits @say-hello="sayHello" @increase-by="increaseBy"></Emits> -->
     <!-- <ComponentVModel></ComponentVModel> -->
     <!-- <TransParentAttributes class="large"></TransParentAttributes> -->
-    <Slots></Slots>
+    <!-- <Slots></Slots> -->
+    <ProvideAndInject></ProvideAndInject>
+    <AnotherComponent></AnotherComponent>
   </div>
 </template>
 <script setup lang="ts">
@@ -54,6 +56,8 @@ import Emits from "./usage/basicUsage/Emits.vue";
 import ComponentVModel from "./usage/basicUsage/ComponentVModel.vue";
 import TransParentAttributes from "./usage/basicUsage/TransParentAttributes.vue";
 import Slots from "./usage/basicUsage/Slots.vue";
+import ProvideAndInject from "./usage/basicUsage/ProvideAndInject.vue";
+import AnotherComponent from "./usage/components/AnotherComponent.vue";
 // 初始渲染的todos
 const todos = ref([
   {

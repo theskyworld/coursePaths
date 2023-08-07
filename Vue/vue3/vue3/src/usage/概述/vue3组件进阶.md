@@ -1033,3 +1033,78 @@ defineOptions({
   </div>
 </template>
 ```
+
+### 依赖注入
+
+使用`defineProps`、`defineEmits`和透传，能够将属性或事件由父组件向子组件传递
+
+使用插槽能够将模板内容由父组件向子组件进行传递
+
+但是以上的传递都是逐级的传递
+
+通过 provide/inject 能够实现父子组件之间跨级的传递
+
+#### Provide
+
+父组件中使用`provide`来在当前组件中提供要传递给子组件的依赖
+
+```vue
+<template>
+  <div>
+    <!-- 依赖注入和提供 -->
+    <!-- 父组件 -->
+    <AnotherComponent></AnotherComponent>
+  </div>
+</template>
+<script setup lang="ts">
+import { inject, provide, ref } from "vue";
+import { messageInjectionKey } from "../../symbols";
+import AnotherComponent from "../components/AnotherComponent.vue";
+
+const msg = ref("hello");
+// 提供依赖
+// 第一个参数为依赖注入名，第二个参数为依赖注入值
+// provide("message", msg);
+// 为避免命名冲突问题，建议使用symbol作为键名
+provide(messageInjectionKey, msg);
+</script>
+<style scoped></style>
+```
+
+或者在`main.ts`中进行依赖的提供，提供之后任意组件都可以直接注入使用
+
+```ts
+import { createApp } from "vue";
+import App from "./App.vue";
+const app = createApp(App);
+
+app.provide("message", "hello!");
+```
+
+#### Inject
+
+在子组件中使用`inject`对父组件中提供的依赖进行注入
+
+```vue
+<template>
+  <div>
+    <!-- 依赖提供和注入 -->
+    <!-- 任意嵌套层级的子组件 -->
+    <p>{{ message }}</p>
+  </div>
+</template>
+<script setup lang="ts">
+import { inject } from "vue";
+import { messageInjectionKey } from "../../symbols";
+
+// 子组件中注入依赖
+// const message = inject("message");
+// 还可以提供默认值
+// const message = inject('message', 'default value')
+const message = inject(messageInjectionKey);
+// 默认值一般通过工厂函数来获取,避免在用不到默认值的情况下产生不必要的开销或副作用
+// 此时应当传入第三个参数true,表示默认值通过工厂函数获得
+// const message = inject(messageInjectionKey, () => "default value", true)
+</script>
+<style scoped></style>
+```

@@ -1,0 +1,1 @@
+export const messageInjectionKey = Symbol("message");
