@@ -694,3 +694,135 @@ console.log(props.firstNameModifiers) // { capitalize: true }
 console.log(props.lastNameModifiers) // { uppercase: true}
 </script>
 ```
+
+### 透传属性
+
+透传属性是指那些被添加在子组件上，且不属于任何 props 或者 emits 的属性，例如`class`、`style`或者`id`
+
+这些属性会自动地添加(继承)到子组件的根元素/根组件上
+
+举例来说，假如我们有一个 `<MyButton>` 组件，它的模板长这样：
+
+```vue
+<template>
+  <!-- 根元素 -->
+  <button>click me</button>
+</template>
+```
+
+在其父组件中为子组件添加`class`属性
+
+```vue
+<template>
+  <MyButton class="large" />
+</template>
+```
+
+最后渲染出的 DOM 结果是
+
+```html
+<button class="large">click me</button>
+```
+
+#### `class`或者`style`的自动合并
+
+如果在子组件的根元素上已经存在了`class`或者`style`属性，则它们会进行合并
+
+```vue
+<template>
+  <!-- 根元素 -->
+  <button class="btn">click me</button>
+</template>
+```
+
+透传`class='large'`属性后，最后渲染出的 DOM 结果会变成
+
+```html
+<button class="btn large">click me</button>
+```
+
+#### 透传事件
+
+类似于属性的透传，事件监听器也能够实现从父组件透传到子组件根元素
+
+```vue
+<!-- 透传事件，该click事件及对应的事件监听器将透传至子组件CustomButton的根元素上 -->
+<CustomButton @click="logHello"></CustomButton>
+```
+
+#### 访问透传过来的属性或事件
+
+通过`$attrs`属性可以子组件中访问父组件透传过来的属性或事件
+
+```vue
+<template>
+  <!-- 透传-->
+  <div class="btn btn__primary">
+    <p>Button</p>
+    {{ $attrs.onClick }}
+    <!-- 值为() => console.log("hello") -->
+    {{ $attrs.class }}
+    <!-- 值为foo-bar -->
+  </div>
+</template>
+<script setup lang="ts">
+import { useAttrs } from "vue";
+
+// 访问透传过来的内容
+const attrs = useAttrs();
+console.log(attrs.class); // "foo-bar"
+console.log(attrs.onClick); // "() => console.log("hello")"
+</script>
+```
+
+对应的父组件为
+
+```vue
+<template>
+<CustomButton class="foo-bar" @click="() => console.log("hello")"></CustomButton>
+</template>
+```
+
+#### 禁用透传属性
+
+如果不希望一个组件将属性或者事件透传给其子组件的根元素或根组件，可以设置` inheritAttrs: false`
+
+```vue
+<script setup>
+defineOptions({
+  inheritAttrs: false,
+});
+</script>
+```
+
+#### 透传至内部的元素是
+
+默认情况下，透传的属性或事件都是传递给子组件的根元素的，但是可以使用` inheritAttrs: false`和`v-bind="$attrs"`属性来将透传的内容添加到指定的内部元素上
+
+```vue
+<template>
+  <!-- 将透传的内容添加到内部元素上 -->
+  <div>
+    <div v-bind="$attrs" class="btn btn__primary">
+      <p>Button</p>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+defineOptions({
+  inheritAttrs: false,
+});
+</script>
+```
+
+#### 多个根元素的透传
+
+如果子组件中存在多个根元素，则需要为其中一个或多个根元素设置`v-bind="$attrs"`属性，透传的内容将被添加到对应的根元素上。如果一个都未添加，将报错
+
+```vue
+<template>
+  <header>...</header>
+  <main v-bind="$attrs">...</main>
+  <footer>...</footer>
+</template>
+```
