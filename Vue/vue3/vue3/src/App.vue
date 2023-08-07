@@ -30,7 +30,8 @@
     <!-- 通过组件进行事件回调函数的传递 -->
     <!-- <Emits @say-hello="sayHello" @increase-by="increaseBy"></Emits> -->
     <!-- <ComponentVModel></ComponentVModel> -->
-    <TransParentAttributes class="large"></TransParentAttributes>
+    <!-- <TransParentAttributes class="large"></TransParentAttributes> -->
+    <Slots></Slots>
   </div>
 </template>
 <script setup lang="ts">
@@ -52,6 +53,7 @@ import Props from "./usage/basicUsage/Props.vue";
 import Emits from "./usage/basicUsage/Emits.vue";
 import ComponentVModel from "./usage/basicUsage/ComponentVModel.vue";
 import TransParentAttributes from "./usage/basicUsage/TransParentAttributes.vue";
+import Slots from "./usage/basicUsage/Slots.vue";
 // 初始渲染的todos
 const todos = ref([
   {

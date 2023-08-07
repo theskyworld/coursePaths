@@ -284,6 +284,7 @@ const doubleAge = computed(() => props.age * 2);
 <template>
   <div class="container">
     <!-- 通过组件进行数据传递 -->
+    <!-- 一次性将多个props进行传递 -->
     <Props v-bind="propsToProps"></Props>
   </div>
 </template>
@@ -824,5 +825,211 @@ defineOptions({
   <header>...</header>
   <main v-bind="$attrs">...</main>
   <footer>...</footer>
+</template>
+```
+
+### 插槽
+
+通过`defineProps`、`defineEmits`和透传，能够将属性或者事件由父组件向子组件进行传递，这些都属性 JS 值的传递
+
+同时，通过插槽能够将模板内容由父组件向子组件传递
+
+当我们不需要使用插槽中，在父组件中添加子组件是这样的:
+
+```vue
+<template>
+  <div>
+    <ChildComponent></ChildComponent>
+    <!-- 使用prop、emit或者透传 -->
+    <ChildComponent
+      class="large"
+      :title="myTitle"
+      @change="onChange"
+    ></ChildComponent>
+  </div>
+</template>
+```
+
+当需要使用插值时，将要传递的模板内容定义在子组件下即可
+
+```vue
+<template>
+  <div>
+    <ChildComponent>
+      <!-- 插槽内容 -->
+      <p>hello</p>
+      <button>click</button>
+    </ChildComponent>
+  </div>
+</template>
+```
+
+上述被传递的模板内容成为插槽内容，要想在子组件中接收传递的模板内容，需要定义插槽出口
+
+```vue
+<!-- ChildComponent.vue -->
+<template>
+  <div>
+    <!-- 插槽出口 -->
+    <!-- 插槽内容会将<slot></slot>替换，在这里渲染插槽内容 -->
+    <slot></slot>
+  </div>
+</template>
+```
+
+#### 默认内容
+
+可以在子组件中指定插槽的默认内容，在父组件中没有提供任何插槽内容的时候进行渲染
+
+```vue
+<!-- ChildComponent.vue -->
+<template>
+  <button>
+    <slot>
+      <!--插槽的默认内容 -->
+      click
+    </slot>
+  </button>
+</template>
+```
+
+#### 具名插槽
+
+当在子组件中定义了多个插槽出口时，可以通过为插槽出口指定名字来方便插槽内容的渲染
+
+```vue
+<!-- ChildComponent.vue -->
+<template>
+  <div class="container">
+    <header>
+      <!-- 拒具名插槽 -->
+      <!-- 提供name属性，方便插槽内容的渲染 -->
+      <slot name="header"></slot>
+    </header>
+    <main>
+      <!-- 未提供name属性，则等价于默认提供name='default' -->
+      <slot></slot>
+    </main>
+    <footer>
+      <slot name="footer"></slot>
+    </footer>
+  </div>
+</template>
+```
+
+对应地，在父组件中通过在插槽内容中的`<template>`元素上提供`v-slot:slotName`(或者简写`#slotName`)来将当前的插槽内容渲染到对应指定的插槽出口上
+
+```vue
+<template>
+  <div>
+    <ChildComponent>
+      <!-- 插槽内容 -->
+      <!-- 渲染到name='header'插槽下 -->
+      <template #header>
+        <h1>header content</h1>
+      </template>
+
+      <!-- 动态插槽名 -->
+      <!-- <template v-slot:[dynamicSlotName]> -->
+      <!-- <h1>header content</h1> -->
+      <!-- </template> -->
+      <!-- 或者 -->
+      <!-- <template #[dynamicSlotName]> -->
+      <!-- <h1>header content</h1> -->
+      <!-- </template> -->
+
+      <!-- 渲染到name='default'插槽下 -->
+      <template #default>
+        <p>main content</p>
+        <p>main content</p>
+      </template>
+
+      <!-- 渲染到name='footer'插槽下 -->
+      <template #footer>
+        <p>footer content</p>
+      </template>
+    </ChildComponent>
+  </div>
+</template>
+```
+
+并且，在父组件中，所有没有位于插槽内容中顶层`<template>`中的内容都默认表示被渲染在默认插槽下
+
+因此，上面的内容就等价于
+
+```vue
+<template>
+  <div>
+    <ChildComponent>
+      <!-- 插槽内容 -->
+      <!-- 渲染到name='header'插槽下 -->
+      <template #header>
+        <h1>header content</h1>
+      </template>
+
+      <!-- 渲染到name='default'插槽下 -->
+      <p>main content</p>
+      <p>main content</p>
+
+      <!-- 渲染到name='footer'插槽下 -->
+      <template #footer>
+        <p>footer content</p>
+      </template>
+    </ChildComponent>
+  </div>
+</template>
+```
+
+#### 作用域插槽
+
+默认情况下，插槽内容(位于父组件内)都无法访问到对应子组件作用域中的，但是可以通过作用域插槽将子组件中的数据由子组件向父组件传递，以便插槽内容内能够访问
+
+```vue
+<!-- ChildComponent.vue -->
+<template>
+  <div>
+    <!-- 通过作用域插槽将以下内容向父组件中的插槽内容中传递 -->
+    <slot text="hello" :count="1"></slot>
+
+    <!-- 结合具名插槽使用 -->
+    <slot name="header" headerText="header"></slot>
+    <slot name="default" defaultText="default"></slot>
+    <slot name="footer" footerText="footer"></slot>
+  </div>
+</template>
+```
+
+```vue
+<template>
+  <div>
+    <!-- 父附件中通过v-slot来对子组件中传递的内容进行接收 -->
+    <ChildComponent v-slot="slotProps">
+      <!-- 插槽内容 -->
+      <p>{{ slotProps.text }}</p>
+      <span>{{ slotProps.count }}</span>
+    </ChildComponent>
+
+    <!-- 或者使用对象的解构语法 -->
+    <ChildComponent v-slot="{ text, count }">
+      <!-- 插槽内容 -->
+      <p>{{ text }}</p>
+      <span>{{ count }}</span>
+    </ChildComponent>
+
+    <!-- 或者结合具名插槽使用 -->
+    <ChildComponent v-slot="{ text, count }">
+      <!-- 插槽内容 -->
+      <template #header="headerProps">
+        <p>{{ headerProps }}</p>
+      </template>
+      <!-- 默认插槽应当显式标出 -->
+      <template #default="defaultProps">
+        <p>{{ defaultProps }}</p>
+      </template>
+      <template #footer="footerProps">
+        <p>{{ footerProps }}</p>
+      </template>
+    </ChildComponent>
+  </div>
 </template>
 ```
