@@ -34,7 +34,8 @@
     <!-- <Slots></Slots> -->
     <!-- <ProvideAndInject></ProvideAndInject> -->
     <!-- <AnotherComponent></AnotherComponent> -->
-    <Uses></Uses>
+    <!-- <Uses></Uses> -->
+    <CustomDirective></CustomDirective>
   </div>
 </template>
 <script setup lang="ts">
@@ -60,6 +61,7 @@ import Slots from "./usage/basicUsage/Slots.vue";
 import ProvideAndInject from "./usage/basicUsage/ProvideAndInject.vue";
 import AnotherComponent from "./usage/components/AnotherComponent.vue";
 import Uses from "./usage/basicUsage/Uses.vue";
+import CustomDirective from "./usage/basicUsage/CustomDirective.vue";
 // 初始渲染的todos
 const todos = ref([
   {
