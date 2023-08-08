@@ -32,8 +32,9 @@
     <!-- <ComponentVModel></ComponentVModel> -->
     <!-- <TransParentAttributes class="large"></TransParentAttributes> -->
     <!-- <Slots></Slots> -->
-    <ProvideAndInject></ProvideAndInject>
-    <AnotherComponent></AnotherComponent>
+    <!-- <ProvideAndInject></ProvideAndInject> -->
+    <!-- <AnotherComponent></AnotherComponent> -->
+    <Uses></Uses>
   </div>
 </template>
 <script setup lang="ts">
@@ -58,6 +59,7 @@ import TransParentAttributes from "./usage/basicUsage/TransParentAttributes.vue"
 import Slots from "./usage/basicUsage/Slots.vue";
 import ProvideAndInject from "./usage/basicUsage/ProvideAndInject.vue";
 import AnotherComponent from "./usage/components/AnotherComponent.vue";
+import Uses from "./usage/basicUsage/Uses.vue";
 // 初始渲染的todos
 const todos = ref([
   {
