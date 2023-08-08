@@ -174,3 +174,82 @@ app.directive("color", (el, binding) => {
 但是当应用到一个多根元素的组件时，指令将会被忽略且抛出一个警告。指令不能通过`v-bind="$attrs"`来传递给一个指定的元素
 
 总的来说，不推荐在组件上使用自定义指令
+
+### 插件
+
+通过插件能够为 vue 提供全局使用的功能，因为它通过`app`进行全局注册
+
+一个插件，可以是一个函数，或者一个包含`install`方法的对象
+
+创建一个插件
+
+```ts
+// plugins\i18n.ts
+// 用于在用户提供的字典中查找指定字符的对应语言翻译后的文本
+// plugins/i18n.js
+export default {
+  install: (app, options) => {
+    // 注入一个全局可用的 $translate() 方法
+    app.config.globalProperties.$translate = (key) => {
+      // 获取 `options` 对象的深层属性
+      // 使用 `key` 作为索引
+      return key.split(".").reduce((o, i) => {
+        if (o) return o[i];
+      }, options);
+    };
+  },
+};
+```
+
+注册一个插件
+
+```ts
+// main.ts
+import i18nPlugin from "./plugins/i18n";
+
+// 第一个参数为要注册的插件名，第二个参数为可选的对象
+// 第二个参数为例如用户提供的简单版本的字典，对于greetings.hello字符，其翻译后的文本为Bonjour!
+app.use(i18nPlugin, {
+  greetings: {
+    hello: "Bonjour!",
+  },
+});
+```
+
+使用插件
+
+```vue
+<template>
+  <h1>{{ $translate("greetings.hello") }}</h1>
+  <!-- {{ $translate('greetings.hello') }}会被替换为Bonjour! -->
+</template>
+```
+
+或者一个插件也可以通过 provide/inject 的方式进行提供和注入使用
+
+```ts
+// plugins/i18n.js
+export default {
+  install: (app, options) => {
+    app.config.globalProperties.$translate = (key) => {
+      return key.split(".").reduce((o, i) => {
+        if (o) return o[i];
+      }, options);
+    };
+
+    // 提供插件
+    app.provide("i18n", options);
+  },
+};
+```
+
+```vue
+<script setup>
+import { inject } from "vue";
+
+// 注入插件使用
+const i18n = inject("i18n");
+
+console.log(i18n.greetings.hello);
+</script>
+```
