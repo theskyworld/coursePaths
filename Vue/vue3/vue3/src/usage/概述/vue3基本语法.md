@@ -72,11 +72,15 @@ app2.mount("#app2");
 同时支持表达式
 
 ```vue
+<!-- 调用方法 -->
 <div>{{ name.toUpperCase() }}</div>
 <div>{{ num + 1 }}</div>
+<!-- 三元表达式 -->
 <div>{{ ok ? "YES" : "NO" }}</div>
 <div>{{ message.split("").reverse().join("") }}</div>
+<!-- 模板字符串 -->
 <div :id="`list-${id}`"></div>
+<!-- 调用函数 -->
 <time :title="toTitleDate(date)" :datetime="date">
   {{ formatDate(date) }}
 </time>
@@ -87,7 +91,7 @@ app2.mount("#app2");
 - 文本插值内
 - vue 指令的值中
 
-需要注意的时,双大括号会将其中的内容解析为**纯文本**,而不是 HTML
+需要注意的是,双大括号会将其中的内容解析为**纯文本**,而不是 HTML
 
 如果需要插入 HTML,应当使用`v-html`指令
 
@@ -95,6 +99,10 @@ app2.mount("#app2");
 <template>
   <div class="container">
     <p v-html="rawHtml"></p>
+  </div>
+  <!-- 解析后的结果为 -->
+  <div class="container">
+    <p><span style="color: red">This should be red.</span></p>
   </div>
 </template>
 <script setup lang="ts">
@@ -148,7 +156,7 @@ const objectOfAttrs = {
 
 - `Infinity`,`undefined`,`NaN`,`isFinite`,`isNaN`,`parseFloat`,`parseInt`,`decodeURI`
 - `decodeURIComponent`,`encodeURI`,`encodeURIComponent`,`Math`,`Number`,`Date`,`Array`
-- `Object`,`Boolean`,`String`,`RegExp`,`Map`,`Set`,`JSON`,`Intl`,`BigInt`,console
+- `Object`,`Boolean`,`String`,`RegExp`,`Map`,`Set`,`JSON`,`Intl`,`BigInt`,`console`
 
 对于其它不能访问到的对象,可以在`app.config.globalProperties `上进行添加,以便在所有的组件中能够直接使用
 
@@ -156,7 +164,7 @@ const objectOfAttrs = {
 
 [vue 指令](https://cn.vuejs.org/api/built-in-directives.html)指的是一系列以`v-`作为前缀的模板中特殊属性
 
-其值期望的是一个 JS 表达式,也即值是动态的.如果需要添加一个静态的属性值,直接添加在 DOM 元素上即可,无需通过指令添加
+其值期望的是一个 JS 表达式,也即值是动态的。如果需要添加一个静态的属性值,直接添加在 DOM 元素上即可,无需通过指令添加
 
 一个指令的作用是,在表达式的值变化时响应式地更新 DOM
 
@@ -292,13 +300,32 @@ const clickFn = () => {
 通过使用`nextTick`可以等待 DOM 更新之后再执行代码
 
 ```ts
-import { nextTick } from "vue";
+<template>
+    <div>
+        <p ref="pElem">{{ countRef }}</p>
+    </div>
+</template>
+<script setup lang='ts'>
+import { nextTick, onMounted, ref } from 'vue';
 
-async function increment() {
-  count.value++;
-  await nextTick();
-  // 现在 DOM 已经更新了
-}
+const countRef = ref(0);
+const pElem = ref();
+
+const addCount = () => countRef.value++;
+
+onMounted(async () => {
+    addCount();
+    // 更新DOM之前p元素中的countRef值
+    console.log(pElem.value.innerText); // 0
+    // 等待DOM元素的更新，需要添加await
+    await nextTick();
+    // 更新DOM之后p元素中的countRef值
+    console.log(pElem.value.innerText); // 1
+})
+
+
+</script>
+<style scoped></style>
 ```
 
 ##### 自动解包
@@ -310,14 +337,14 @@ async function increment() {
   ```vue
   <template>
     <div class="container">
-      <p>{{ count + 1 }}</p>
+      <p>{{ num + 1 }}</p>
       <!-- <p>{{ obj.id + 1 }}</p> -->
       <p>{{ obj.id.value + 1 }}</p>
       <p>{{ id + 1 }}</p>
     </div>
   </template>
   <script setup lang="ts">
-  import { nextTick, reactive, ref } from "vue";
+  import { ref } from "vue";
 
   // 顶级 ref
   const num = ref(3);
@@ -332,7 +359,7 @@ async function increment() {
   <style scoped></style>
   ```
 
-- 作为一个 reactive 对象(不包含 shallowReactive)的属性时
+- 作为一个 reactive 对象(不包含 shallowReactive)的属性值时
 
   ```ts
   const num1 = ref(0);
@@ -369,7 +396,7 @@ console.log(map.get("count")!.value); // 0
 
 `ref`实现响应式是将目标对象包装在一个特殊的对象中，然后通过`.value`来访问目标对象的响应值
 
-而`reactive`是直接是目标对象本身具有响应式，直接通过读取对象本身的值就可以获取响应式值
+而`reactive`是直接使目标对象本身(其代理对象)具有响应式，通过直接读取对象本身的值就可以获取响应式值
 
 当`ref`中的目标值为一个对象时，会在底层调用`reactive`实现响应式
 
@@ -380,7 +407,7 @@ console.log(map.get("count")!.value); // 0
   </div>
 </template>
 <script setup lang="ts">
-import { nextTick, reactive, ref } from "vue";
+import { ref } from "vue";
 
 // reactive
 const state = reactive({
@@ -399,7 +426,7 @@ const state = reactive({
   </div>
 </template>
 <script setup lang="ts">
-import { nextTick, reactive, ref } from "vue";
+import { ref } from "vue";
 
 // reactive
 // 深层响应式
@@ -458,7 +485,7 @@ console.log(reactive(proxy) === proxy); // true
     const state2 = reactive({ countNum: 0 });
     let { countNum } = state2;
     // countNum将丢失响应式
-    // 对state无影响
+    // 对state2无影响
     const addCountNum = () => countNum++;
 
     // 或者将响应式对象的属性作为一个参数传递给函数时也将失去响应式
@@ -560,10 +587,14 @@ const getAgeMoreThanTenUser = () =>
   <div class="container">
     <p>{{ now }}</p>
     <p>{{ getNow() }}</p>
+    <p>{{ countRef }}</p>
+    <!-- 点击按钮，让组件重渲染，getNow()将跟随被调用 -->
+    <button @click="countRef++">click</button>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, reactive } from "vue";
+import { computed, ref } from "vue";
+const countRef = ref(0);
 
 const now = computed(() => {
   console.log("now called ...");
@@ -595,19 +626,22 @@ const doubleCount = computed(() => count.value * 2);
 
 ```ts
 // 可写的计算属性
-const count = ref(1);
-const doubleCount1 = computed({
-  get() {
-    return count.value * 2;
-  },
-  set(newVal) {
-    // 修改依赖的值，触发计算属性的重新计算，返回新的doubleCount1值
-    // 等价于对doubleCount1进行修改
-    count.value = newVal / 2;
-  },
+import { computed, ref } from "vue";
+
+const countRef = ref(1);
+const doubleCountRef = computed({
+    get() {
+        return countRef.value * 2;
+    },
+    set(newVal) {
+        // 修改依赖的值，触发计算属性的重新计算，返回新的doubleCount1值
+        // 等价于对doubleCount1进行修改
+        countRef.value = newVal / 2;
+    }
 });
-doubleCount1.value = 3;
-console.log(doubleCount1.value); // 3
+doubleCountRef.value = 3;
+console.log(countRef.value); // 1.5
+console.log(doubleCountRef.value); // 3
 ```
 
 ### 类和样式绑定
@@ -734,6 +768,25 @@ div {
 </style>
 ```
 
+##### 值为一个变量
+```vue
+<template>
+    <div class="container">
+        <button :class="activeClass"></button>
+        <!-- 解析后的结果为 -->
+        <button class="active"></button>
+    </div>
+</template>
+<script setup lang="ts">
+
+import { ref } from "vue";
+
+const activeClass = ref('active');
+
+</script>
+<style scoped></style>
+```
+
 ##### 值为数组
 
 此时数组中存在的元素的值代表要添加的类名，不存在的则代表不添加
@@ -753,7 +806,6 @@ const activeClass = ref("active");
 // 添加text-danger类
 const errClass = ref("text-danger");
 
-//
 </script>
 <style scoped>
 div {
@@ -770,7 +822,7 @@ div {
 </style>
 ```
 
-要控制某个类名的是否添加通过在模板中使用三元表达式或者结合对象来进行控制
+要控制某个类名的是否添加,通过在模板中使用三元表达式或者结合对象来进行控制
 
 ```vue
 <template>
@@ -855,7 +907,7 @@ div {
 
 #### 绑定`style`
 
-类似于绑定`class`，也是用于动态的切换一个元素的样式，其值也存在对象和数组两种
+类似于绑定`class`，也是用于动态地切换一个元素的样式，其值也存在对象和数组两种
 
 ##### 值为对象
 
@@ -934,15 +986,15 @@ const colorfulStyle = reactive({
   <div>
     <!-- 条件渲染 -->
     <!-- v-if -->
-    <!-- 控制元素的是否渲染 -->
+    <!-- 控制元素是否渲染 -->
     <p v-if="isRender">someText</p>
     <button @click="isRender = !isRender">toggleIsRender</button>
 
     <!-- v-else -->
-    <!-- 控制渲染元素的替代品 -->
+    <!-- 控制渲染元素的替代内容 -->
     <p v-if="isWonderful">wonderful!</p>
     <p v-else>Opps!</p>
-    <button @click="isWonderful = !isWonderful">toogleIsWonderful</button>
+    <button @click="isWonderful = !isWonderful">toggleIsWonderful</button>
 
     <!-- v-else-if -->
     <!-- 控制渲染哪个元素 -->
@@ -967,7 +1019,7 @@ const isRender = ref(true);
 const isWonderful = ref(true);
 
 const names = ["Alice1", "Alice2", "Alice3"];
-let name = ref("Alice1");
+const name = ref("Alice1");
 const switchName = () => {
   name.value = names[Math.floor(Math.random() * 3)];
 };
@@ -976,6 +1028,7 @@ const switchName = () => {
 ```
 
 ##### 惰性渲染
+`v-if`的渲染为惰性的，如果其值初始为`false`，则不会做任何事情
 
 ```vue
 <template>
@@ -988,7 +1041,7 @@ const switchName = () => {
 
     <!-- v-show -->
     <p v-show="isShow">vShow</p>
-    <button @click="isShow = !isShow">toogleIsShow</button>
+    <button @click="isShow = !isShow">toggleIsShow</button>
   </div>
 </template>
 <script setup lang="ts">
@@ -1012,7 +1065,7 @@ const isShow = ref(false);
     <!-- 条件渲染 -->
     <!-- v-show -->
     <p v-show="isShow">vShow</p>
-    <button @click="isShow = !isShow">toogleIsShow</button>
+    <button @click="isShow = !isShow">toggleIsShow</button>
   </div>
 </template>
 <script setup lang="ts">
@@ -1026,10 +1079,10 @@ const isShow = ref(false);
 
 区别在于
 
-- `v-show`会在 DOM 渲染中保留该元素，切换时只是切换元素的`display`属性，并且无论初始条件为 true 还是 false，初始时都会将元素进行渲染
-- `v-if`则是真实地将元素进行销毁或者重建，在切换时，元素对应的事件监听器、子组件等都会跟着进行销毁或重建。并且，其渲染是惰性的，如果初始条件为 false，则不会做任何事情，直到条件为 true 之后才进行渲染
+- `v-show`会在 DOM 渲染中保留该元素，切换时只是切换元素的`display`属性，并且无论初始条件为 `true` 还是 `false`，初始时都会将元素进行渲染
+- `v-if`则是真实地将元素进行销毁或者重建，在切换时，元素对应的事件监听器、子组件等都会跟着进行销毁或重建。并且，其渲染是惰性的，如果初始条件为 `false`，则不会做任何事情，直到条件为 `true` 之后才进行渲染
 - 因此，`v-if`有更高的切换开销，`v-show`有更高的初始渲染开销。如果需要频繁切换，使用`v-show`，反之，使用`v-if`
-- v-show 不支持在 `<template>` 元素上使用，也不能和 `v-else` 搭配使用
+- `v-show` 不支持在 `<template>` 元素上使用，也不能和 `v-else` 搭配使用
 
 ### 列表渲染
 
@@ -1121,7 +1174,7 @@ const obj = reactive({
 
 ##### 遍历范围数值
 
-还可以基于一个表示范围的数组进行列表渲染
+还可以基于一个表示范围的数值进行列表渲染
 
 ```vue
 <template>
@@ -1375,6 +1428,7 @@ const greet = (e: Event) => {
 #### 按键修饰符
 
 通过绑定特定的按键(`keyName`),当按键抬起或者按下时(`@keyup|keydown`触发特定的回调函数(`'callback'`)
+
 形式为`@keyup|keydown.keyName='callback'`
 
 ```vue
@@ -1439,7 +1493,7 @@ const logContent = () => console.log(content.value);
 
 ##### `.exact`修饰符
 
-在上述跟事件绑定的情况中,只要是满足了按下 alt 的同时点击按钮的条件就会触发 logContent 事件回调函数,即使同时按下 Alt 或 Shift 也会触发
+在上述跟事件绑定的情况中,只要是满足了按下 alt 的同时点击按钮的条件就会触发 `logContent` 事件回调函数,即使同时按下 Alt 或 Shift 也会触发
 
 通过`.exact`修饰符可以对上述问题进行修正
 
@@ -1483,13 +1537,30 @@ const msg = ref('')
 
 其底层逻辑是通过`v-bind`将表单输入框中`value`属性的值与变量(`msg`)进行绑定,实现`value`的值跟随`msg`变量的值进行变化;
 
-同时监听输入框的 input 事件,将输入框中的值(`value`值)发生更改时,每次将更改后的值重新赋值给`msg`变量,实现`msg`变量的更新
+同时监听输入框的 `input` 事件,在输入框中的值(`value`值)发生更改时,每次将更改后的值重新赋值给`msg`变量,实现`msg`变量的更新
 
 最终实现`value`和`msg`的双向绑定
 
 ```html
-<input type="text" :value="msg" @input="e => msg = (e.target as any)?.value" />
-<!-- 使用这种的形式,其中一种与v-model的区别在于: 对于需要使用 IME 的语言 (中文，日文和韩文等),在拼字阶段也触发更新-->
+<template>
+    <div>
+        <p>{{ msg }}</p>
+        <input type="text" :value="msg" @input="e => msg = (e.target as any)?.value" />
+        <!-- 或者 -->
+        <input type="text" :value="msg" @input="changeMsg($event)">
+        <!-- 使用这种的形式,其中一种与v-model的区别在于: 对于需要使用 IME 的语言 (中文，日文和韩文等),在拼字阶段也触发更新-->
+
+    </div>
+</template>
+<script setup lang='ts'>
+import { ref } from 'vue';
+
+
+const msg = ref("");
+const changeMsg = (e: Event) => msg.value = (e.target as any).value;
+
+</script>
+<style scoped></style>
 ```
 
 对于不同类型的输入框,会绑定不同的属性和监听不同的事件:

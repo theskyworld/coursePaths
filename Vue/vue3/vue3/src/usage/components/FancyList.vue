@@ -24,15 +24,5 @@ setTimeout(() => {
 }, 1000)
 </script>
 <style scoped>
-ul {
-    list-style-type: none;
-    padding: 5px;
-    background: linear-gradient(315deg, #42d392 25%, #647eff);
-}
-
-li {
-    padding: 5px 20px;
-    margin: 10px;
-    background: #fff;
-}
+@import url("../styles/fancyList.css");
 </style>

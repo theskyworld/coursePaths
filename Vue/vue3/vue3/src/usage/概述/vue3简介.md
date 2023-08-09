@@ -20,7 +20,7 @@ vue 是一款用于构建用户界面的 JS 框架，基于 HTML、CSS 和 JS �
   }).mount("#app");
   </script>
   ```
-- 组件化:一个.vue 文件就是一个组件，其中继承了所需的 HTML、CSS 和 JS
+- 组件化:一个.vue 文件就是一个组件，其中集合了所需的 HTML、CSS 和 JS
 - 响应式:vue 自动追踪 JS 中依赖的变化，并响应式地更新 DOM
 
 ### 渐进式使用 vue
@@ -32,11 +32,11 @@ vue 是一款用于构建用户界面的 JS 框架，基于 HTML、CSS 和 JS �
 相应的不需要构建步骤的轻量版本:[petite-vue](https://github.com/vuejs/petite-vue)
 
 ```html
-<!-- 在这里书写所需地html内容 -->
+<!-- 在这里书写所需的html内容 -->
 <script src="https://unpkg.com/petite-vue"></script>
 <script>
   // 导入vue脚本文件后，在这里对vue进行使用
-  // 例如将vue挂载到指定地容器上，进行vue响应式页面地渲染等
+  // 例如将vue挂载到指定的容器上，进行vue响应式页面的渲染等
 </script>
 ```
 
@@ -114,7 +114,7 @@ const greeting = ref("Hello World!");
 - 提供自动补全和模板内表达式的类型检查等 IDE 支持
 - 模块热更新(HMR)支持
 
-对于一个单文件组件,在编译阶段会在底层交由[@vue/compiler-sfc](https://github.com/vuejs/core/tree/main/packages/compiler-sfc)将其转换为一个标准的 JS 文件和 CSS 文件,转换之后可以向其它 ES 模块进行导入
+对于一个单文件组件,在编译阶段会在底层交由[@vue/compiler-sfc](https://github.com/vuejs/core/tree/main/packages/compiler-sfc)将其转换为一个标准的 JS 文件和 CSS 文件,转换之后可以在其它ES模块中进行导入使用
 
 ```js
 import MyComponent from "./MyComponent.vue";
@@ -172,7 +172,7 @@ npm init vite
 <script>
   // 此时Vue变量已经从上述的CDN中进行了构建,并作为了一个全局的对象,可直接使用
   console.log(Vue);
-  // 每次可直接从Vue中导入所需要的内容来进行使用
+  // 每次可直接从Vue中解构所需要的属性来进行使用
   const { createApp, ref } = Vue;
 
   createApp({
@@ -222,7 +222,7 @@ npm init vite
 </script>
 ```
 
-但是,可以通过使用使用 Import maps (导入映射表)来声明一个 vue 变量,并将其与 CDN 链接进行映射,每次改而从改变量中导入内容来使用
+但是,可以通过使用使用 Import maps (导入映射表)来声明一个 vue 变量,并将其与 CDN 链接进行映射,每次改而从该变量中导入内容来使用
 
 [浏览器兼容情况](https://caniuse.com/import-maps)
 
