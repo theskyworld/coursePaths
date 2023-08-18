@@ -546,5 +546,90 @@ function onLeave(el, done) {
   </TransitionGroup>
 </template>
 <style scoped></style>
+```
 
+#### KeepAlive
+
+在组件的动态切换中,一个组件的切换包含了组件的卸载和再挂载的过程,如果频繁切换,可能导致大量性能消耗的问题
+
+但是,通过`<KeepAlive>`组件来对一个组件实例进行缓存,保存其切换前的状态,使其在切换过程中不被卸载
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import ComponentA from "./ComponentA.vue";
+import ComponentB from "./ComponentB.vue";
+
+const currentComponent = ref(ComponentA);
+
+function switchComponent(newComponent) {
+  currentComponent.value = newComponent;
+}
+</script>
+<template>
+  <a @click="switchComponent(ComponentA)">ComponentA</a>
+  <a @click="switchComponent(ComponentB)">ComponentB</a>
+
+  <KeepAlive>
+    <component :is="currentComponent"></component>
+  </KeepAlive>
+</template>
+<style scoped></style>
+```
+
+##### `include`/`exclude`
+
+默认情况下,KeepAlive 会将动态切换过程中的所有组件进行缓存
+
+通过`include`/`exclude`属性,可以指定哪些组件应当/不应当被缓存
+
+其值为一个或多个组件的组件名,通过组件实例中声明的`name`属性的值
+
+在版本**3.2.34**之后,使用组合式 API 语法(`<script setup>`)中,会自动根据`.vue`文件的文件名来推断当前组件实例的组件名,不需要额外声明`name`属性
+
+```vue
+<template>
+  <!-- 值可以为,分隔的多个字符串 -->
+  <KeepAlive include="a,b">
+    <component :is="currentComponent" />
+  </KeepAlive>
+
+  <!-- 值可以为一个正则表达式 -->
+  <KeepAlive :include="/a|b/">
+    <component :is="currentComponent" />
+  </KeepAlive>
+
+  <!-- 值可以为一个数组 -->
+  <KeepAlive :include="['a', 'b']">
+    <component :is="currentComponent" />
+  </KeepAlive>
+</template>
+```
+
+##### 最大缓存数量
+
+可以通过`max`属性来指定组件被缓存的最大的数量.当超过这个值时,被访问的距离时间最长的那个组件将被销毁
+
+```vue
+<template>
+  <KeepAlive :max="10">
+    <component :is="currentComponent" />
+  </KeepAlive>
+</template>
+```
+
+##### 被缓存的组件的声明周期钩子
+
+在 KeepAlive 下的组件,称那些未在 DOM 页面中展示的组件的状态为**deactivated**,那个在 DOM 页面中进行展示的组件状态为**activated**.对应的钩子函数分别为`onDeactivated`和`onActivated`
+
+```vue
+<script setup>
+import { onActivated, onDeactivated } from "vue";
+
+// 在组件(包含其子组件)进行初始化渲染,以及之后每次被重新插入到DOM页面中时调用
+onActivated(() => {});
+
+// 在组件(包含其子组件)被卸载,以及之后每次从DOM页面中移除时调用
+onDeactivated(() => {});
+</script>
 ```

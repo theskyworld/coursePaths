@@ -37,7 +37,8 @@
     <!-- <Uses></Uses> -->
     <!-- <CustomDirective></CustomDirective> -->
     <!-- <BasicTransition></BasicTransition> -->
-    <BasicTransitionGroup></BasicTransitionGroup>
+    <!-- <BasicTransitionGroup></BasicTransitionGroup> -->
+    <BasicKeepAlive></BasicKeepAlive>
   </div>
 </template>
 <script setup lang="ts">
@@ -66,6 +67,7 @@ import Uses from "./usage/basicUsage/Uses.vue";
 import CustomDirective from "./usage/basicUsage/CustomDirective.vue";
 import BasicTransition from "./usage/basicUsage/transition/BasicTransition.vue";
 import BasicTransitionGroup from "./usage/basicUsage/transition/BasicTransitionGroup.vue";
+import BasicKeepAlive from "./usage/basicUsage/keepAlive/BasicKeepAlive.vue"
 // 初始渲染的todos
 const todos = ref([
   {
