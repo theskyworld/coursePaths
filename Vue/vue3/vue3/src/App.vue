@@ -38,7 +38,8 @@
     <!-- <CustomDirective></CustomDirective> -->
     <!-- <BasicTransition></BasicTransition> -->
     <!-- <BasicTransitionGroup></BasicTransitionGroup> -->
-    <BasicKeepAlive></BasicKeepAlive>
+    <!-- <BasicKeepAlive></BasicKeepAlive> -->
+    <BasicTeleport></BasicTeleport>
   </div>
 </template>
 <script setup lang="ts">
@@ -68,6 +69,7 @@ import CustomDirective from "./usage/basicUsage/CustomDirective.vue";
 import BasicTransition from "./usage/basicUsage/transition/BasicTransition.vue";
 import BasicTransitionGroup from "./usage/basicUsage/transition/BasicTransitionGroup.vue";
 import BasicKeepAlive from "./usage/basicUsage/keepAlive/BasicKeepAlive.vue"
+import BasicTeleport from "./usage/basicUsage/teleport/BasicTeleport.vue";
 // 初始渲染的todos
 const todos = ref([
   {

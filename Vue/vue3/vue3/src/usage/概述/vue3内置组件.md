@@ -633,3 +633,171 @@ onActivated(() => {});
 onDeactivated(() => {});
 </script>
 ```
+
+#### Teleport
+
+通过`<Teleport>`组件能够将当前组件内的一部分传送到当前组件 DOM 结构之外的其它 DOM 结构中
+
+例如,存在这样一个场景:一个模态的展示和开启模态的按钮都书写在当前的例如`MyModal.vue`组件下,当开启模态时,模态能够成功地在当前组件的 DOM 结构内进行展示
+
+但是,如果想要模态能够相对于整个窗口进行固定定位,如果模态的 DOM 结构存在当前组件的 DOM 结构中,则其最近的那个父元素将不会是整个窗口页面中最顶层的那个父元素
+
+此时,就需要将模态的 DOM 结构传送到`<body>`元素下,以便能够相对于整个窗口进行固定定位
+
+通过`<Teleport>`进行实现
+
+将一个模态组件传送到`<body>`元素下进行展示
+
+**需要注意的是,Teleport 只是对组件中元素的 DOM 结构进行修改,并不影响组件之间的层级关系,以及组件间 props 和 emits 的传递,以及 provide/inject 等**
+
+```vue
+<script setup lang="ts">
+import MyModal from "./MyModal.vue";
+const showModal = ref(false);
+</script>
+<template>
+  <div class="container">
+    <!-- 开启模态-->
+    <button id="show-modal" @click="showModal = true">Show Modal</button>
+
+    <!-- 模态的展示 -->
+    <!-- 通过Teleport的to属性将其传送到body元素下进行展示,以便相对于整个窗口进行固定定位 -->
+    <Teleport to="body">
+      <MyModal :show="showModal" @close="showModal = false">
+        <template #header>
+          <h3>custom header</h3>
+        </template>
+      </MyModal>
+    </Teleport>
+  </div>
+</template>
+<style scoped>
+.container {
+  height: 1000px;
+}
+
+body {
+  overflow: scroll;
+}
+</style>
+```
+
+创建一个`MyModal.vue`模态组件
+
+```vue
+<script setup>
+// 模态组件,用于渲染模态的样式
+const props = defineProps({
+  show: Boolean,
+});
+</script>
+
+<template>
+  <Transition name="modal">
+    <div v-if="show" class="modal-mask">
+      <div class="modal-container">
+        <div class="modal-header">
+          <slot name="header">default header</slot>
+        </div>
+
+        <div class="modal-body">
+          <slot name="body">default body</slot>
+        </div>
+
+        <div class="modal-footer">
+          <slot name="footer">
+            default footer
+            <button class="modal-default-button" @click="$emit('close')">
+              OK
+            </button>
+          </slot>
+        </div>
+      </div>
+    </div>
+  </Transition>
+</template>
+
+<style>
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  transition: opacity 0.3s ease;
+}
+
+.modal-container {
+  width: 300px;
+  margin: auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
+}
+
+.modal-header h3 {
+  margin-top: 0;
+  color: #42b983;
+}
+
+.modal-body {
+  margin: 20px 0;
+}
+
+.modal-default-button {
+  float: right;
+}
+
+/* 模态的动画样式 */
+
+.modal-enter-from {
+  opacity: 0;
+}
+
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .modal-container,
+.modal-leave-to .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
+}
+</style>
+```
+
+##### Teleport 的动态开启
+
+可以通过`disable`属性来动态控制是否使用 Teleport
+
+```vue
+<!-- 例如,如果为一个手机设备,则禁用Teleport -->
+<Teleport :disabled="isMobile">
+  ...
+</Teleport>
+```
+
+将多个 DOM 结构分析传送到同一个目标元素下时,将按照传送的顺序进行 DOM 结构的添加
+
+```vue
+<Teleport to="#modals">
+  <div>A</div>
+</Teleport>
+<Teleport to="#modals">
+  <div>B</div>
+</Teleport>
+```
+
+解析后
+
+```html
+<div id="modals">
+  <div>A</div>
+  <div>B</div>
+</div>
+```
