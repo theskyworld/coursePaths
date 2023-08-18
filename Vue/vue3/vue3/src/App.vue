@@ -35,7 +35,9 @@
     <!-- <ProvideAndInject></ProvideAndInject> -->
     <!-- <AnotherComponent></AnotherComponent> -->
     <!-- <Uses></Uses> -->
-    <CustomDirective></CustomDirective>
+    <!-- <CustomDirective></CustomDirective> -->
+    <!-- <BasicTransition></BasicTransition> -->
+    <BasicTransitionGroup></BasicTransitionGroup>
   </div>
 </template>
 <script setup lang="ts">
@@ -62,6 +64,8 @@ import ProvideAndInject from "./usage/basicUsage/ProvideAndInject.vue";
 import AnotherComponent from "./usage/components/AnotherComponent.vue";
 import Uses from "./usage/basicUsage/Uses.vue";
 import CustomDirective from "./usage/basicUsage/CustomDirective.vue";
+import BasicTransition from "./usage/basicUsage/transition/BasicTransition.vue";
+import BasicTransitionGroup from "./usage/basicUsage/transition/BasicTransitionGroup.vue";
 // 初始渲染的todos
 const todos = ref([
   {
