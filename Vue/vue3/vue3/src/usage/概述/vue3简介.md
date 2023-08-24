@@ -40,6 +40,11 @@ vue 是一款用于构建用户界面的 JS 框架，基于 HTML、CSS 和 JS �
 </script>
 ```
 
+(不同格式的构建文件)[https://unpkg.com/browse/vue@3.3.4/dist/]
+- 只包含运行时的版本 : 不包含模板编译器，模板需经过构建步骤进行预先编译。前缀为`vue.runtime.*`
+- 完全版本 : 包含了模板编译器，支持直接在浏览器中编译模板。名称中不包含` .runtime`的
+- 轻量级、不依赖构建步骤的版本 : (petite-vue)[https://github.com/vuejs/petite-vue]
+
 #### 作为 Web Component 嵌入使用
 
 使用 vue 来构建标准的 Web Component,然后将其嵌入到任何 HTML 页面中
@@ -54,7 +59,50 @@ TODO : 进入[Vue 与 Web Components](https://cn.vuejs.org/guide/extras/web-comp
 
 在构建页面,向后端获取数据时,除了要求后端提供 API 数据接口外,还可以搭配例如[Inertia.js](https://inertiajs.com/)之类的无需任何 API 的解决方案进行使用
 
-TODO : 进入[全面的工具链支持](https://cn.vuejs.org/guide/scaling-up/tooling.html),对此处进行完善
+##### 项目脚手架
+通过官方提供的脚手架工具来初始化一个Vue项目
+
+- 使用(Vite)[https://cn.vitejs.dev/]构建工具
+  ```bash
+  npm create vue@latest
+  ```
+  或者
+  ```bash
+  npm init vite
+  ```
+
+- 使用(Vue CLI)[https://cli.vuejs.org/zh/]
+  ```bash
+  vue create my-project
+  ```
+
+- 如何从Vue CLI迁移至Vite
+  - (迁移指南)[https://vueschool.io/articles/vuejs-tutorials/how-to-migrate-from-vue-cli-to-vite/]
+  - (相关工具/插件)(https://github.com/vitejs/awesome-vite#vue-cli)
+
+##### IDE插件支持
+vue3中使用Volar取代Vue2中的Vetur
+- VSCode/WebStorm : (Volar)[https://code.visualstudio.com/]
+- Sublime Text : (LSP-Volar)[https://github.com/sublimelsp/LSP-volar]
+- vim / Neovim : (coc-volar)[https://github.com/yaegassy/coc-volar]
+- emacs : (lsp-mode)[https://emacs-lsp.github.io/lsp-mode/page/lsp-volar/]
+
+##### 测试
+推荐使用以下测试框架
+- [Cypress](https://www.cypress.io/)
+- [Vitest](https://vitest.dev/)
+- [Jest](https://jestjs.io/)
+
+##### 代码规范
+- 使用[ESLint](https://eslint.org/)进行书写代码时代码规范的检查，使用时安装对应的插件[ESLint for VSCode](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+- 搭配[eslint-plugin-vue](https://github.com/vuejs/eslint-plugin-vue)进行使用
+
+##### 自定义块插件
+- 如果使用的是Vite进行构建，需要使用一个[插件](https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue#example-for-transforming-custom-blocks)将自定义块转换为可执行的JS代码
+- 如果使用的是Vue CLI或者webpack，则使用[loader](https://vue-loader.vuejs.org/zh/guide/custom-blocks.html)进行配置
+
+##### 浏览器开发者插件
+(Vue Devtools)[https://devtools.vuejs.org/]
 
 #### 全栈/服务端渲染(SSR)
 
