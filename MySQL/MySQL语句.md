@@ -17,7 +17,8 @@ SELECT * -- 选择所有的列 （注意选择所有的列可能对服务器造�
 FROM customers -- 从customers数据表中进行获取
 -- FROM sql_store.customers
 WHERE customer_id = 1 -- 筛选出customer_id = 1的行
-ORDER BY first_name; -- 按照first_name进行排序
+ORDER BY first_name -- 按照first_name进行排序
+LIMIT 3; -- 取前三行
 ```
 
 ```sql
@@ -208,7 +209,8 @@ SELECT *
 FROM customers
 ORDER BY state, first_name; -- 同时根据state和first_name进行排序，state优先于first_name
 
-SELECT *, quantity * unit_price AS total_price
+
+SELECT *, quantity * unit_price AS total_price -- 新增total_price列用于展示
 FROM order_items
 WHERE order_id = 2
 ORDER BY quantity * unit_price DESC;
@@ -217,4 +219,21 @@ SELECT *, quantity * unit_price AS total_price
 FROM order_items
 WHERE order_id = 2
 ORDER BY total_price DESC;
+```
+
+### `limit`语句
+
+```sql
+SELECT * 
+FROM customers
+LIMIT 3; -- 从customers中前三行的所有列
+
+SELECT *
+FROM customers
+LIMIT 6, 3; -- 第一个数字表示偏移量，跳过前六行，取第7-9三行中的所有列
+
+SELECT *
+FROM customers
+ORDER BY points DESC
+LIMIT 3;
 ```
