@@ -456,3 +456,37 @@ LEFT JOIN order_items oi
  ON p.product_id = oi.product_id;
 
 ```
+
+#### 多表外连接
+
+```sql
+USE sql_store;
+
+SELECT * 
+FROM customers c
+LEFT JOIN orders o
+ ON c.customer_id = o.customer_id
+LEFT JOIN shippers s
+ ON o.shipper_id = s.shipper_id
+ORDER BY c.customer_id;
+
+```
+
+```sql
+USE sql_store;
+
+SELECT 
+ order_date,
+    o.order_id,
+    c.first_name,
+    s.name AS shipper,
+    os.name AS status
+FROM orders o
+JOIN customers c
+ ON o.customer_id = c.customer_id
+LEFT JOIN shippers s
+ ON o.shipper_id = s.shipper_id
+JOIN order_statuses os
+ ON o.status = os.order_status_id
+ORDER BY order_id;
+```
