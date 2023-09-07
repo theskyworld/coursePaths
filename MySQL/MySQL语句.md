@@ -287,3 +287,29 @@ FROM sql_store.order_items oi
 JOIN products p 
 ON oi.product_id = p.product_id;
 ```
+
+#### 自连接
+
+```sql
+USE sql_hr;
+
+-- 将employees表进行自连接，
+-- 展示所有员工以及其对应的reports_to的上级领导的信息
+-- 便于建立类似于以下的组织架构图
+--         上级领导
+--  
+-- 员工一   员工二  员工三 ...
+SELECT *
+FROM employees e
+JOIN employees m
+ON e.reports_to = m.employee_id;
+
+
+SELECT 
+ e.employee_id,
+    e.first_name,
+    m.first_name AS manager
+FROM employees e
+JOIN employees m
+ON e.reports_to = m.employee_id;
+```
