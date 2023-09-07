@@ -565,4 +565,62 @@ JOIN clients c
  USING(client_id)
 JOIN payment_methods pm
  ON p.payment_method = pm.payment_method_id;
+
 ```
+
+### 自然连接
+
+让系统自己基于不同的数据表之间共同的列来进行连接
+
+```sql
+USE sql_store;
+
+
+SELECT 
+ o.order_id,
+    c.first_name
+FROM orders o
+NATURAL JOIN customers c
+```
+
+### 交叉连接
+
+```sql
+USE sql_store;
+
+
+SELECT
+ c.first_name AS customer,
+    p.name AS product
+FROM customers c
+CROSS JOIN products p
+ORDER BY c.first_name;
+
+-- 隐式写法
+SELECT
+ c.first_name AS customer,
+    p.name AS product
+FROM customers c, products p
+ORDER BY c.first_name
+```
+
+```sql
+USE sql_store;
+
+
+SELECT 
+ s.name AS shipper,
+    p.name AS product
+FROM shippers s
+CROSS JOIN products p
+ORDER BY s.name;
+
+-- 隐式写法
+SELECT 
+ s.name AS shipper,
+    p.name AS product
+FROM shippers s, products p
+ORDER BY s.name;
+```
+
+
