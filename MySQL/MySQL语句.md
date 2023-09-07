@@ -237,3 +237,40 @@ FROM customers
 ORDER BY points DESC
 LIMIT 3;
 ```
+
+## 连接性语句
+
+使用内连接或者外连接语句来同时选取多张数据表中的内容
+
+### 内连接
+
+#### 跨数据表连接
+
+```sql
+-- 同时选取orders和customers数据表中的所有列，当两表中的customer_id列的值相同时
+SELECT *
+FROM orders
+JOIN customers
+ON orders.customer_id = customers.customer_id;
+
+
+-- 同时选取orders和customers数据表中的order_id, orders.customer_id, first_name, last_name列，当两表中的customer_id列的值相同时
+SELECT order_id, orders.customer_id, first_name, last_name
+FROM orders
+JOIN customers
+ON orders.customer_id = customers.customer_id;
+
+
+-- 分别给orders和customers取别名
+-- 取别名后原名orders和customers将失效
+SELECT order_id, o.customer_id, first_name, last_name
+FROM orders o
+JOIN customers c
+ON o.customer_id = c.customer_id;
+
+
+SELECT order_id, oi.product_id, quantity, oi.unit_price, p.name
+FROM order_items oi
+JOIN products p
+ON oi.product_id = p.product_id;
+```
