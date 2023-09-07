@@ -402,3 +402,57 @@ WHERE o.customer_id = c.customer_id;
 
 ```
 
+### 外连接
+
+#### 左连接
+
+```sql
+USE sql_store;
+
+-- 使用以下内连接只能选取到有订单的客户
+SELECT 
+    c.customer_id, c.first_name, o.order_id
+FROM
+    customers c
+        JOIN
+    orders o ON c.customer_id = o.customer_id
+ORDER BY c.customer_id;
+
+-- 现使用外连接，选取到所有的客户
+-- 左连接，JOIN关键字左侧的数据表(customers)中的行都会被选取，无论是否符合连接条件
+SELECT 
+ c.customer_id,
+    c.first_name,
+    o.order_id
+FROM customers c
+LEFT JOIN orders o
+ ON c.customer_id = o.customer_id
+ORDER BY c.customer_id;
+```
+
+#### 右连接
+
+```sql
+-- 右连接，JOIN关键字右侧的数据表(orders)中的行都会被选取，无论是否符合连接条件
+SELECT 
+ c.customer_id,
+    c.first_name,
+    o.order_id
+FROM customers c
+RIGHT JOIN orders o
+ ON c.customer_id = o.customer_id
+ORDER BY c.customer_id;
+```
+
+```sql
+USE sql_store;
+
+SELECT 
+ p.product_id,
+    name,
+    quantity
+FROM products p
+LEFT JOIN order_items oi
+ ON p.product_id = oi.product_id;
+
+```
