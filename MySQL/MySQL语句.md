@@ -274,3 +274,16 @@ FROM order_items oi
 JOIN products p
 ON oi.product_id = p.product_id;
 ```
+
+#### 跨数据库连接
+
+```sql
+-- 跨sql_inventory和sql_store数据库
+USE sql_inventory;
+
+
+SELECT *
+FROM sql_store.order_items oi
+JOIN products p 
+ON oi.product_id = p.product_id;
+```
