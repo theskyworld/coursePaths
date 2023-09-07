@@ -39,7 +39,8 @@
     <!-- <BasicTransition></BasicTransition> -->
     <!-- <BasicTransitionGroup></BasicTransitionGroup> -->
     <!-- <BasicKeepAlive></BasicKeepAlive> -->
-    <BasicTeleport></BasicTeleport>
+    <!-- <BasicTeleport></BasicTeleport> -->
+    <Index/>
   </div>
 </template>
 <script setup lang="ts">
@@ -70,6 +71,9 @@ import BasicTransition from "./usage/basicUsage/transition/BasicTransition.vue";
 import BasicTransitionGroup from "./usage/basicUsage/transition/BasicTransitionGroup.vue";
 import BasicKeepAlive from "./usage/basicUsage/keepAlive/BasicKeepAlive.vue"
 import BasicTeleport from "./usage/basicUsage/teleport/BasicTeleport.vue";
+import Index from "./cases/index.vue";
+
+
 // 初始渲染的todos
 const todos = ref([
   {

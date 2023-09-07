@@ -1,6 +1,6 @@
 ## vue3 基本语法
 
-### 创建应用实例
+### 创建应用实例(!!IMPORTANT)
 
 #### `createApp`创建应用
 
@@ -66,12 +66,15 @@ app2.mount("#app2");
 一种最基本的将数据绑定到 DOM 上的形式,使用双大括号语法
 
 ```vue
+<template>
 <span>Message: {{ msg }}</span>
+</template>
 ```
 
 同时支持表达式
 
 ```vue
+<template>
 <!-- 调用方法 -->
 <div>{{ name.toUpperCase() }}</div>
 <div>{{ num + 1 }}</div>
@@ -84,6 +87,8 @@ app2.mount("#app2");
 <time :title="toTitleDate(date)" :datetime="date">
   {{ formatDate(date) }}
 </time>
+</template>
+
 ```
 
 在模板内,JS 表达式可以被使用在以下场景中:
@@ -135,7 +140,7 @@ const rawHtml = '<span style="color: red">This should be red.</span>';
   <button :disabled="isButtonDisabled">Button</button>
   ```
 
-绑定多个动态值
+绑定多个动态值(!!IMPORTANT)
 
 ```vue
 <template>
@@ -186,7 +191,7 @@ const objectOfAttrs = {
 
   <!-- 简写 -->
   <a :href="url"> ... </a>
-  <!-- 解析后为<a url='https://api.github.com/user'> ... </a> -->
+  <!-- 解析后为<a href='https://api.github.com/user'> ... </a> -->
 </template>
 <script setup>
 const url = "https://api.github.com/user";
@@ -204,7 +209,7 @@ const sayHello = () => console.log("hello");
 </script>
 ```
 
-动态参数:vue 指定不仅支持其值是动态的,也支持其参数也是动态的
+动态参数:vue 指定不仅支持其值是动态的,也支持其参数也是动态的(!!IMPORTANT)
 
 ```vue
 <template>
@@ -214,7 +219,6 @@ const sayHello = () => console.log("hello");
   <p :[attributeName]="attributeValue">dynamic argument</p>
 </template>
 <script setup>
-// 或者使用计算属性
 const attributeName = "class";
 const attributeValue = "danger";
 </script>
