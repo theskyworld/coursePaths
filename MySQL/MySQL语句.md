@@ -490,3 +490,17 @@ JOIN order_statuses os
  ON o.status = os.order_status_id
 ORDER BY order_id;
 ```
+
+#### 结合自连接
+
+```sql
+USE sql_hr;
+
+SELECT 
+ e.employee_id,
+    e.first_name,
+    m.first_name
+FROM employees e
+LEFT JOIN employees m
+ ON e.reports_to = m.employee_id;
+···
