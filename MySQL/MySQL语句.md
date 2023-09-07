@@ -363,3 +363,21 @@ JOIN payment_methods pm
  ON p.payment_method = pm.payment_method_id;
 ```
 
+#### 复合连接条件
+
+连接带有复合主键的数据表
+
+复合主键只一个数据表中存在多个列名作为主键值，以便将他们结合起来来标记每项的唯一性
+
+```sql
+USE sql_store;
+
+SELECT *
+FROM order_items oi
+JOIN order_item_notes oin
+ ON oi.order_id = oin.order_id
+ AND oi.product_id = oin.product_id;
+
+```
+
+
