@@ -53,6 +53,8 @@ FROM customers; -- 从customers中选择state列，如果在该列中存在重�
 
 ### `where`语句
 
+关系运算符
+
 ```sql
 SELECT * 
 FROM customers
@@ -106,6 +108,8 @@ AND quantity * unit_price > 30; -- 在order_items中选择所有order_id的值�
 -- != 或者 <>  
 ```
 
+取反运算
+
 ```sql
 SELECT * 
 FROM customers
@@ -115,6 +119,8 @@ WHERE state IN ("VA", "FL", "GA");
 -- 取反
 WHERE state NOT IN ("VA", "FL", "GA");
 ```
+
+`between...and...`
 
 ```sql
 SELECT * 
@@ -130,6 +136,8 @@ SELECT *
 FROM customers
 WHERE birth_date BETWEEN '1990-01-01' AND '2000-01-01';
 ```
+
+字符串匹配
 
 ```sql
 SELECT *
@@ -173,6 +181,40 @@ FROM customers
 WHERE last_name REGEXP 'br|bu';
 -- 或者
 WHERE last_name REGEXP 'b[ru]';
+```
+
+`Null`
+
+```sql
+SELECT * 
+FROM customers
+WHERE phone IS NULL; -- phone列的值为Null
+WHERE phone IS NOT NULL; -- phone列的值不为Null
+
+SELECT * 
+FROM orders
+WHERE shipped_date IS NULL;
+```
+
+### `order by`语句
+
+```sql
+SELECT * 
+FROM customers
+ORDER BY first_name DESC; -- 根据first_name进行降序排序
 
 
+SELECT * 
+FROM customers
+ORDER BY state, first_name; -- 同时根据state和first_name进行排序，state优先于first_name
+
+SELECT *, quantity * unit_price AS total_price
+FROM order_items
+WHERE order_id = 2
+ORDER BY quantity * unit_price DESC;
+-- 等价于
+SELECT *, quantity * unit_price AS total_price
+FROM order_items
+WHERE order_id = 2
+ORDER BY total_price DESC;
 ```
