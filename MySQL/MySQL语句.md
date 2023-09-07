@@ -689,3 +689,55 @@ FROM customers
 WHERE points > 3000
 ORDER BY first_name;
 ```
+
+## 对行进行操作
+
+### 列属性
+
+根据当前列的属性对当前列中能输入的每行的值、值的类型、该列是否为主键、值是否递增等进行限制
+
+![image-20230908011240674](C:\Users\ycx\AppData\Roaming\Typora\typora-user-images\image-20230908011240674.png)
+
+#### 插入单行
+
+```sql
+USE sql_store;
+
+-- 对所有的列进行赋值
+INSERT INTO customers
+-- 依次填写第一列(customer_id)、第二列(first_name)、第三列(last_name)...的值
+-- 因为第一列(存在默认值)默认自动递增，所以直接填写其默认值DEFAULT，而不是填写自定义的值
+VALUES(
+    DEFAULT,
+    'JOhn',
+    'Smith',
+    '1990-01-01',
+    NULL,
+    'address',
+    'city',
+    'CA',
+    DEFAULT
+    )
+
+```
+
+```sql
+-- 对指定的列进行赋值，不赋值的使用默认值
+INSERT INTO customers (
+    first_name,
+    last_name,
+    birth_date,
+    address,
+    city,
+    state
+    )
+VALUES(
+    'JOhn2',
+    'Smith2',
+    '1990-01-01',
+    'address',
+    'city',
+    'CA'
+);
+
+```
