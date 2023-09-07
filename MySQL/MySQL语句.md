@@ -240,7 +240,7 @@ LIMIT 3;
 
 ## 连接性语句
 
-使用内连接或者外连接语句来同时选取多张数据表中的内容
+使用内连接或者外连接语句来同时选取多张数据表或数据库中的内容
 
 ### 内连接
 
@@ -380,4 +380,25 @@ JOIN order_item_notes oin
 
 ```
 
+#### 隐式连接条件写法
+
+建议使用显式写法
+
+```sql
+-- 连接条件的隐式写法
+USE sql_store;
+
+-- 显式写法
+SELECT * 
+FROM orders o
+JOIN customers c
+ ON o.customer_id = c.customer_id;
+    
+-- 等价于
+-- 隐式写法
+SELECT * 
+FROM orders o, customers c
+WHERE o.customer_id = c.customer_id;
+
+```
 
