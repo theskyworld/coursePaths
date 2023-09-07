@@ -503,4 +503,66 @@ SELECT
 FROM employees e
 LEFT JOIN employees m
  ON e.reports_to = m.employee_id;
-···
+```
+
+### `using`语句
+
+当例如连接条件中出现多个同名的名称时，可以使用`using`语句来简化连接条件的书写
+
+```sql
+USE sql_store;
+
+SELECT 
+ o.order_id,
+    c.first_name
+FROM orders o
+JOIN customers c
+ -- ON o.customer_id = c.customer_id;
+    -- 等价于
+    USING(customer_id);
+
+```
+
+```sql
+USE sql_store;
+
+SELECT 
+ o.order_id,
+    c.first_name,
+    sh.name AS shipper
+FROM orders o
+JOIN customers c
+    USING(customer_id)
+LEFT JOIN shippers sh
+ USING(shipper_id);
+
+```
+
+```sql
+-- 处理复合连接条件（主键）
+USE sql_store;
+
+SELECT *
+FROM order_items oi
+JOIN order_item_notes oin
+ -- ON oi.order_id = oin.order_id
+    -- AND oi.product_id = oin.product_id;
+-- 等价于
+ USING(order_id, product_id);
+```
+
+```sql
+USE sql_invoicing;
+
+
+SELECT 
+ date,
+    c.name AS client,
+    amount,
+    pm.name AS payment_method
+FROM payments p 
+JOIN clients c
+ USING(client_id)
+JOIN payment_methods pm
+ ON p.payment_method = pm.payment_method_id;
+```
