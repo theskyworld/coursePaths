@@ -781,3 +781,56 @@ VALUES
     (LAST_INSERT_ID(), 2, 1, 3.99);
 
 ```
+
+### 复制数据表
+
+复制所有的内容
+
+```sql
+USE sql_store;
+
+
+-- 创建orders_archived数据表，并将orders表中的所有内容复制到新表中
+-- 创建的新表不具备主键，且值不会默认自动递增
+CREATE TABLE orders_archived AS
+SELECT * FROM orders;
+```
+
+复制指定的内容
+
+```sql
+USE sql_store;
+
+
+-- 复制指定的内容
+CREATE TABLE orders_archived AS
+SELECT * FROM orders
+WHERE order_date < '2019-01-01';
+
+
+-- 将指定的内容插入orders_archived表中
+INSERT INTO orders_archived
+SELECT * FROM orders
+WHERE order_date < '2019-01-01';
+```
+
+```sql
+USE sql_invoicing;
+
+
+CREATE TABLE invoices_archived AS
+SELECT
+ i.invoice_id,
+    i.number,
+    c.name AS client,
+    i.invoice_total,
+    i.payment_total,
+    i.invoice_date,
+    i.due_date,
+    i.payment_date
+FROM invoices i
+JOIN clients c
+ USING(client_id)
+WHERE payment_date IS NOT NULL;
+```
+
