@@ -1015,3 +1015,49 @@ FROM invoices
 WHERE invoice_date BETWEEN '2019-01-01' AND '2019-12-31';
 
 ```
+
+## 数据分组
+
+```sql
+USE sql_invoicing;
+
+-- 通过以下命令能够计算出所有client的invoice_total的总和
+SELECT 
+ SUM(invoice_total) AS total_sales
+FROM invoices;
+
+-- 现在依据client_id进行数据分组，计算出每个client_id的invoice_total总和
+SELECT 
+ client_id,
+ SUM(invoice_total) AS total_sales
+FROM invoices
+GROUP BY client_id
+ORDER BY total_sales DESC;
+
+```
+
+```sql
+SELECT 
+    state,
+    city,
+    SUM(invoice_total) AS total_sales
+FROM invoices i
+JOIN clients USING(client_id)
+GROUP BY state, city;
+
+```
+
+```sql
+USE sql_invoicing;
+
+SELECT
+ date,
+    pm.name AS payment_method,
+    SUM(amount) AS total_payments
+FROM payments p
+JOIN payment_methods pm
+ON p.payment_method = pm.payment_method_id
+GROUP BY date, payment_method
+ORDER BY date;
+
+```
