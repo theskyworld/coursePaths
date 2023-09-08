@@ -944,3 +944,74 @@ WHERE client_id = (
     WHERE name = 'Myworks'
     );
 ```
+
+## 聚合函数
+
+MySQL中内置了一些函数，可以直接进行使用
+
+- `max()`
+- `min()`
+- `AVG()`
+- `SUM()`
+- `COUNT()`
+
+```sql
+use sql_invoicing;
+
+-- 只会对非空值进行计算
+SELECT 
+    MAX(invoice_total) AS highest,
+    MAX(payment_date) AS latest_payment,
+    MIN(invoice_total) AS lowest,
+    AVG(invoice_total) AS average,
+    SUM(invoice_total) AS total,
+    COUNT(invoice_total) AS number_of_invoices,
+    COUNT(payment_date) AS count_of_payments,
+    COUNT(*) AS total_record  -- 这将计算空值
+FROM invoices;
+```
+
+```sql
+use sql_invoicing;
+
+-- 只会对非空值进行计算
+SELECT 
+ MAX(invoice_total) AS highest,
+    MAX(invoice_date) AS latest_invoice,
+    MIN(invoice_total) AS lowest,
+    AVG(invoice_total) AS average,
+    SUM(invoice_total * 1.1) AS total, -- 使用表达式
+    COUNT(client_id) AS total_of_client_id,  -- 计算时默认重复的值也会进行计算
+    COUNT(DISTINCT client_id) AS distinct_total_of_client_id -- 将计算唯一值
+FROM invoices
+WHERE invoice_date > '2019-07-01'  -- 添加筛选条件
+```
+
+```sql
+USE sql_invoicing;
+
+SELECT
+ 'First half od 2019' AS date_range,
+    SUM(invoice_total) AS total_sales,
+    SUM(payment_total) AS total_payments,
+    SUM(invoice_total - payment_total) AS what_we_expect
+FROM invoices
+WHERE invoice_date BETWEEN '2019-01-01' AND '2019-06-30'
+UNION
+SELECT
+ 'Second half od 2019' AS date_range,
+    SUM(invoice_total) AS total_sales,
+    SUM(payment_total) AS total_payments,
+    SUM(invoice_total - payment_total) AS what_we_expect
+FROM invoices
+WHERE invoice_date BETWEEN '2019-07-01' AND '2019-12-31'
+UNION
+SELECT
+ 'total' AS date_range,
+    SUM(invoice_total) AS total_sales,
+    SUM(payment_total) AS total_payments,
+    SUM(invoice_total - payment_total) AS what_we_expect
+FROM invoices
+WHERE invoice_date BETWEEN '2019-01-01' AND '2019-12-31';
+
+```
