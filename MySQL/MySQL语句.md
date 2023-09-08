@@ -690,7 +690,7 @@ WHERE points > 3000
 ORDER BY first_name;
 ```
 
-## 插入性语句 
+## 插入性语句
 
 ### 列属性
 
@@ -852,4 +852,26 @@ UPDATE invoices
 SET payment_total = invoice_total * 0.5,
  payment_date = due_date
 WHERE invoice_id = 3 -- 只对invoice_id的值为1的行进行更新
+```
+
+### 更新多行
+
+```sql
+USE sql_invoicing;
+
+
+UPDATE invoices
+SET payment_total = invoice_total * 0.5,
+ payment_date = due_date
+WHERE client_id = 3; -- 更新所有client_id的值为3的行
+WHERE client_id IN (3,4); -- 更新所有client_id的值为3或4的行
+```
+
+```sql
+USE sql_store;
+
+
+UPDATE customers
+SET ponits = points + 50
+WHERE birth_date < '1990-01-01';
 ```
