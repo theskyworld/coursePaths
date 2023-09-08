@@ -690,7 +690,7 @@ WHERE points > 3000
 ORDER BY first_name;
 ```
 
-## 对行进行操作
+## 插入性语句
 
 ### 列属性
 
@@ -698,7 +698,7 @@ ORDER BY first_name;
 
 ![image-20230908011240674](C:\Users\ycx\AppData\Roaming\Typora\typora-user-images\image-20230908011240674.png)
 
-#### 插入单行
+### 插入单行
 
 ```sql
 USE sql_store;
@@ -739,5 +739,45 @@ VALUES(
     'city',
     'CA'
 );
+
+```
+
+### 插入多行
+
+```sql
+USE sql_store;
+
+INSERT INTO shippers(name)
+VALUES('Shipper1'),
+ ('Shipper1'),
+ ('Shipper3');
+```
+
+```sql
+USE sql_store;
+
+INSERT INTO products(name, quantity_in_stock,unit_price)
+VALUES ('Product1', 10, 1.92),
+ ('Product2', 21, 1.72),
+ ('Product3', 12, 1.12)
+ ```
+
+### 往多张数据表中插入
+
+```sql
+USE sql_store;
+
+
+-- 执行多条插入命令
+-- 父级表
+INSERT INTO orders (customer_id, order_date, status)
+VALUES (1, '2019-01-01', 1);
+
+-- 子级表
+-- 使用LAST_INSERT_ID()函数，获取最新的id，以便进行id的更新
+INSERT INTO order_items
+VALUES
+ (LAST_INSERT_ID(), 1, 1, 2.99),
+    (LAST_INSERT_ID(), 2, 1, 3.99);
 
 ```
