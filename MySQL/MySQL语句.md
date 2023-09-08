@@ -926,4 +926,21 @@ WHERE customer_id IN
                     );
 ```
 
+## 删除性语句
 
+```sql
+USE sql_invoicing;
+
+DELETE FROM invoices
+WHERE invoice_id = 1;
+
+-- 使用子查询
+USE sql_invoicing;
+
+DELETE FROM invoices
+WHERE client_id = (
+ SELECT client_id 
+    FROM clients
+    WHERE name = 'Myworks'
+    );
+```
