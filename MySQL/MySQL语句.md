@@ -875,3 +875,55 @@ UPDATE customers
 SET ponits = points + 50
 WHERE birth_date < '1990-01-01';
 ```
+
+### 使用子查询
+
+在更新、插入或新建、删除时，如果包含子查询语句的话，先执行子查询语句，确保目标内容正确，再进行更新、插入或新建、删除的操作
+
+```sql
+USE sql_invoicing;
+
+
+UPDATE invoices
+SET 
+ payment_total = invoice_total * 0.5,
+ payment_date = due_date
+WHERE client_id =     
+    (    -- 先使用子查询确定要更新的client_id值，然后再进行更新
+                SELECT client_id
+                FROM clients
+                WHERE name = 'Myworks'   -- 传入时传入的为name的值，但使用依据client_id进行更新
+                );
+WHERE client_id IN     
+    (    
+                SELECT client_id
+                FROM clients
+                WHERE state IN ('CA', 'NY') 
+                );
+
+```
+
+```sql
+UPDATE invoices
+SET 
+ payment_total = invoice_total * 0.5,
+ payment_date = due_date
+WHERE payment_date IS NULL
+```
+
+```sql
+USE sql_store;
+
+
+UPDATE orders
+SET 
+ comments = 'gold customer'
+WHERE customer_id IN 
+     (
+                    SELECT customer_id
+                    FROM customers
+                    WHERE points > 3000
+                    );
+```
+
+
